@@ -17,6 +17,7 @@ from beamontarget.gui.gui_widgets import (
     get_project_folder as _get_project_folder,
     to_relative_path as _to_relative_path,
     resolve_path as _resolve_path,
+    symbol_text,
 )
 
 
@@ -65,15 +66,15 @@ class GeometryTab(ttk.Frame):
         # Buttons
         btn_frm = ttk.Frame(card, style="Card.TFrame")
         btn_frm.pack(fill="x", pady=(10, 0))
-        ttk.Button(btn_frm, text="+ Add Folder…", style="Secondary.TButton",
+        ttk.Button(btn_frm, text=f"{symbol_text('+', '')} Add Folder...", style="Secondary.TButton",
                     command=self._add_geo_folder).pack(side="left", padx=(0, 4))
-        ttk.Button(btn_frm, text="✎ Edit Selected…", style="Secondary.TButton",
+        ttk.Button(btn_frm, text=f"{symbol_text('✎', '')} Edit Selected...", style="Secondary.TButton",
                     command=self._edit_geo_folder).pack(side="left", padx=4)
-        ttk.Button(btn_frm, text="✕ Remove", style="Secondary.TButton",
+        ttk.Button(btn_frm, text=f"{symbol_text('✕', '')} Remove", style="Secondary.TButton",
                     command=self._remove_geo_folder).pack(side="left", padx=4)
-        ttk.Button(btn_frm, text="🔍 ParaView", style="Secondary.TButton",
+        ttk.Button(btn_frm, text=f"{symbol_text('🔍', '')} ParaView", style="Secondary.TButton",
                     command=self._view_geometry).pack(side="right", padx=(4, 0))
-        ttk.Button(btn_frm, text="🔷 Open3D", style="Secondary.TButton",
+        ttk.Button(btn_frm, text=f"{symbol_text('🔷', '')} Open3D", style="Secondary.TButton",
                     command=self._view_geometry_o3d).pack(side="right", padx=4)
 
         # --- 2-D Bounding-box plot ---
@@ -89,7 +90,7 @@ class GeometryTab(ttk.Frame):
                                    state="readonly", width=8)
         proj_combo.pack(side="left", padx=(6, 12))
 
-        ttk.Button(ctrl_frm, text="↻ Refresh Plot", style="Secondary.TButton",
+        ttk.Button(ctrl_frm, text=f"{symbol_text('↻', '')} Refresh Plot", style="Secondary.TButton",
                     command=self._update_plot).pack(side="left")
 
         self._fig = Figure(figsize=(6, 3.2), dpi=100)
@@ -107,8 +108,9 @@ class GeometryTab(ttk.Frame):
         for folder, s in self.cfg.get("GEOMETRY_FOLDERS", {}).items():
             self.geo_tree.insert("", "end", values=(
                 folder, s.get("scale", 1), s.get("target_length", 1.0),
-                "✓" if s.get("save_details") else "", "✓" if s.get("is_diagnostic") else "",
-                "✓" if s.get("save_impact_data") else "",
+                symbol_text("✓", "Y") if s.get("save_details") else "",
+                symbol_text("✓", "Y") if s.get("is_diagnostic") else "",
+                symbol_text("✓", "Y") if s.get("save_impact_data") else "",
                 s.get("max_impact_records") if s.get("max_impact_records") is not None else "—"))
 
     def _add_geo_folder(self):

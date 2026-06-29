@@ -6,10 +6,17 @@ import subprocess
 import shlex
 import importlib
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import ttk, messagebox, filedialog, scrolledtext
 import threading
 
-from beamontarget.gui.gui_widgets import make_card, _SCRIPT_DIR
+from beamontarget.gui.gui_widgets import (
+    make_card,
+    _SCRIPT_DIR,
+    choose_font_family,
+    supports_symbol_fonts,
+    symbol_text,
+)
 
 # ---------------------------------------------------------------------------
 #  Module-level constants (mirrors sim_gui.py)
@@ -70,7 +77,15 @@ class RunTab(ttk.Frame):
         self._queued_config_paths = []
         self._sim_process = None
         self._stop_requested = False
+        self._font_family = choose_font_family()
+        self._supports_symbol_fonts = supports_symbol_fonts(self._font_family)
         self._build()
+
+    def _choose_font_family(self):
+        return choose_font_family()
+
+    def _symbol_label(self, symbol, fallback=""):
+        return symbol_text(symbol, fallback, self._font_family)
 
     # ------------------------------------------------------------------
     #  Build UI
@@ -81,21 +96,21 @@ class RunTab(ttk.Frame):
         btn_row = ttk.Frame(btn_card, style="Card.TFrame")
         btn_row.pack(fill="x")
 
-        ttk.Button(btn_row, text="💾 Save Config", style="Secondary.TButton",
+        ttk.Button(btn_row, text=f"{self._symbol_label('💾', '')} Save Config", style="Secondary.TButton",
                     command=self._save_ext).pack(side="left", padx=(0, 4))
-        ttk.Button(btn_row, text="💾 Save As…", style="Secondary.TButton",
+        ttk.Button(btn_row, text=f"{self._symbol_label('💾', '')} Save As...", style="Secondary.TButton",
                     command=self._save_as_ext).pack(side="left", padx=4)
-        ttk.Button(btn_row, text="📂 Load Config…", style="Secondary.TButton",
+        ttk.Button(btn_row, text=f"{self._symbol_label('📂', '')} Load Config...", style="Secondary.TButton",
                     command=self._load_config_ext).pack(side="left", padx=4)
 
         ttk.Separator(btn_row, orient="vertical").pack(side="left", fill="y",
                                                          padx=12, pady=2)
 
-        ttk.Button(btn_row, text="▶  Run Simulation", style="Accent.TButton",
+        ttk.Button(btn_row, text=f"{self._symbol_label('▶', '')} Run Simulation", style="Accent.TButton",
                     command=self._run_sim).pack(side="left", padx=4)
-        ttk.Button(btn_row, text="≈  Run Smoothing Only", style="Secondary.TButton",
+        ttk.Button(btn_row, text=f"{self._symbol_label('↻', '')} Run Smoothing Only", style="Secondary.TButton",
                 command=self._run_smoothing_only).pack(side="left", padx=4)
-        ttk.Button(btn_row, text="⏹  Stop", style="Danger.TButton",
+        ttk.Button(btn_row, text=f"{self._symbol_label('⏹', '')} Stop", style="Danger.TButton",
                     command=self._stop_sim).pack(side="left", padx=4)
 
         # SDCC checkbox (Linux HPC only — hidden on Windows)

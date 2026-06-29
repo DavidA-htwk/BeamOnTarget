@@ -8,6 +8,7 @@ Launches run_simulation.py as a subprocess (preserving CLI compatibility).
 Launches ParaView externally for geometry and results viewing.
 """
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import ttk, messagebox, filedialog
 import ctypes
 import os
@@ -30,6 +31,9 @@ from beamontarget.gui.gui_widgets import (
     set_project_folder as _set_project_folder,
     get_project_folder as _get_project_folder,
     to_relative_path as _to_relative_path,
+    choose_font_family,
+    supports_symbol_fonts,
+    symbol_text,
 )
 from beamontarget.gui.gui_fields import FieldsTab
 from beamontarget.gui.gui_reactions import ReactionsTab
@@ -188,6 +192,8 @@ class SimGUI(tk.Tk):
         self._active_config_path = _CONFIG_JSON
         self._queued_config_paths = []
         self._stop_requested = False
+        self._font_family = choose_font_family()
+        self._supports_symbol_fonts = supports_symbol_fonts(self._font_family)
 
         self.withdraw()
         self._set_app_icon()
@@ -205,6 +211,12 @@ class SimGUI(tk.Tk):
         self.deiconify()
         self.lift()
         self.after(250, self._close_startup_logo)
+
+    def _choose_font_family(self):
+        return choose_font_family()
+
+    def _symbol_label(self, symbol, fallback=""):
+        return symbol_text(symbol, fallback, self._font_family)
 
     def _set_app_icon(self):
         """Set the runtime app icon for title bar/taskbar on Windows."""
@@ -260,6 +272,15 @@ class SimGUI(tk.Tk):
         # Use clam as the base - it supports most colour overrides
         style.theme_use("clam")
 
+        try:
+            for name in ("TkDefaultFont", "TkMenuFont", "TkHeadingFont", "TkTextFont", "TkFixedFont"):
+                font = tkfont.nametofont(name)
+                if font:
+                    font.configure(family=self._font_family)
+        except Exception:
+            pass
+        self.option_add("*Font", f"{{{self._font_family}}} 10")
+
         # --- Colour palette ---
         BG       = "#f0f2f5"   # main background
         CARD_BG  = "#ffffff"   # card / frame background
@@ -277,7 +298,7 @@ class SimGUI(tk.Tk):
         style.configure("TNotebook", background=BG, borderwidth=0)
         style.configure("TNotebook.Tab",
                          background=BG, foreground=FG, padding=[14, 6],
-                         font=("Segoe UI", 10))
+                         font=("DejaVu Sans", 10))
         style.map("TNotebook.Tab",
                    background=[("selected", CARD_BG)],
                    foreground=[("selected", ACCENT)],
@@ -289,41 +310,41 @@ class SimGUI(tk.Tk):
 
         # Labels
         style.configure("TLabel", background=BG, foreground=FG,
-                         font=("Segoe UI", 10))
+                         font=("DejaVu Sans", 10))
         style.configure("Card.TLabel", background=CARD_BG, foreground=FG,
-                         font=("Segoe UI", 10))
+                         font=("DejaVu Sans", 10))
         style.configure("Header.TLabel", background=BG, foreground=ACCENT,
-                         font=("Segoe UI", 12, "bold"))
+                         font=("DejaVu Sans", 12, "bold"))
         style.configure("CardHeader.TLabel", background=CARD_BG,
-                         foreground=ACCENT, font=("Segoe UI", 11, "bold"))
+                         foreground=ACCENT, font=("DejaVu Sans", 11, "bold"))
         style.configure("Dim.TLabel", background=BG, foreground=FG_DIM,
-                         font=("Segoe UI", 9))
+                         font=("DejaVu Sans", 9))
         style.configure("Status.TLabel", background=BORDER, foreground=FG,
-                         font=("Segoe UI", 9), padding=[8, 4])
+                         font=("DejaVu Sans", 9), padding=[8, 4])
 
         # Buttons
-        style.configure("TButton", font=("Segoe UI", 10), padding=[10, 5],
+        style.configure("TButton", font=("DejaVu Sans", 10), padding=[10, 5],
                          background=ACCENT, foreground="white", borderwidth=0)
         style.map("TButton",
                    background=[("active", ACCENT2), ("pressed", ACCENT2)],
                    foreground=[("disabled", FG_DIM)])
 
-        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"),
+        style.configure("Accent.TButton", font=("DejaVu Sans", 10, "bold"),
                          padding=[14, 6], background=ACCENT, foreground="white")
         style.map("Accent.TButton",
                    background=[("active", ACCENT2)])
 
-        style.configure("Danger.TButton", font=("Segoe UI", 10),
+        style.configure("Danger.TButton", font=("DejaVu Sans", 10),
                          padding=[10, 5], background=DANGER, foreground="white")
         style.map("Danger.TButton",
                    background=[("active", "#b91c1c")])
 
-        style.configure("Success.TButton", font=("Segoe UI", 10),
+        style.configure("Success.TButton", font=("DejaVu Sans", 10),
                          padding=[10, 5], background=SUCCESS, foreground="white")
         style.map("Success.TButton",
                    background=[("active", "#15803d")])
 
-        style.configure("Secondary.TButton", font=("Segoe UI", 10),
+        style.configure("Secondary.TButton", font=("DejaVu Sans", 10),
                          padding=[10, 5], background="#e2e8f0", foreground=FG,
                          borderwidth=0)
         style.map("Secondary.TButton",
@@ -332,24 +353,24 @@ class SimGUI(tk.Tk):
         # Entries
         style.configure("TEntry", fieldbackground="white", foreground=FG,
                          borderwidth=1, padding=[6, 4],
-                         font=("Segoe UI", 10))
+                         font=("DejaVu Sans", 10))
 
         # Spinbox
         style.configure("TSpinbox", fieldbackground="white", foreground=FG,
-                         padding=[6, 4], font=("Segoe UI", 10))
+                         padding=[6, 4], font=("DejaVu Sans", 10))
 
         # Checkbutton
         style.configure("TCheckbutton", background=BG, foreground=FG,
-                         font=("Segoe UI", 10))
+                         font=("DejaVu Sans", 10))
         style.configure("Card.TCheckbutton", background=CARD_BG,
-                         foreground=FG, font=("Segoe UI", 10))
+                         foreground=FG, font=("DejaVu Sans", 10))
 
         # Treeview
         style.configure("Treeview", background="white", foreground=FG,
                          fieldbackground="white", rowheight=26,
-                         font=("Segoe UI", 10), borderwidth=0)
+                         font=("DejaVu Sans", 10), borderwidth=0)
         style.configure("Treeview.Heading", background=BG, foreground=FG,
-                         font=("Segoe UI", 10, "bold"), padding=[4, 4])
+                         font=("DejaVu Sans", 10, "bold"), padding=[4, 4])
         style.map("Treeview",
                    background=[("selected", "#dbeafe")],
                    foreground=[("selected", ACCENT)])
@@ -485,7 +506,7 @@ class SimGUI(tk.Tk):
     # ------------------------------------------------------------------
     def _build_general_tab(self, nb):
         outer = ttk.Frame(nb)
-        nb.add(outer, text="  ⚙  General  ")
+        nb.add(outer, text=f"  {self._symbol_label('⚙', '')} General  ")
 
         # --- Tracking Method card ---
         method_card = self._make_card(outer, "Tracking Method", pady=(12, 10))
@@ -665,7 +686,7 @@ class SimGUI(tk.Tk):
             view_geometry_fn=self._view_geometry,
             view_geometry_o3d_fn=self._view_geometry_o3d,
         )
-        nb.add(self._geometry_tab, text="  📐  Geometry  ")
+        nb.add(self._geometry_tab, text=f"  {self._symbol_label('📐', '')} Geometry  ")
 
     # ------------------------------------------------------------------
     #  PARTICLES tab (delegated to gui_particles.py)
@@ -675,7 +696,7 @@ class SimGUI(tk.Tk):
             nb, self.cfg, self._colours,
             view_sources_o3d_fn=self._view_sources_o3d,
         )
-        nb.add(self._particles_tab, text="  🔬  Particles  ")
+        nb.add(self._particles_tab, text=f"  {self._symbol_label('🔬', '')} Particles  ")
 
     @property
     def var_src_dir(self):
@@ -687,7 +708,7 @@ class SimGUI(tk.Tk):
     def _build_fields_tab(self, nb):
         self._fields_tab = FieldsTab(nb, self.cfg,
                                      get_collect_fn=self._collect)
-        nb.add(self._fields_tab, text="  🧲  Fields  ")
+        nb.add(self._fields_tab, text=f"  {self._symbol_label('🧲', '')} Fields  ")
 
     # ------------------------------------------------------------------
     #  REACTIONS tab (delegated to gui_reactions.py)
@@ -700,7 +721,7 @@ class SimGUI(tk.Tk):
             get_em_step=lambda: self.var_em_step.get(),
             get_collect_fn=self._collect,
         )
-        nb.add(self._reactions_tab, text="  ➜  Reactions  ")
+        nb.add(self._reactions_tab, text=f"  {self._symbol_label('➜', '')} Reactions  ")
 
     # ------------------------------------------------------------------
     #  OUTPUT tab (delegated to gui_output.py)
@@ -710,7 +731,7 @@ class SimGUI(tk.Tk):
             nb, self.cfg, self._colours,
             open_extract_fn=self._open_extract_dialog,
         )
-        nb.add(self._output_tab, text="  📁  Output  ")
+        nb.add(self._output_tab, text=f"  {self._symbol_label('📁', '')} Output  ")
 
     @property
     def var_outdir(self):
@@ -792,7 +813,7 @@ class SimGUI(tk.Tk):
             open_extract_fn=self._open_extract_dialog,
             view_results_o3d_fn=self._view_results_o3d,
         )
-        nb.add(self._results_tab, text="  📊  Results  ")
+        nb.add(self._results_tab, text=f"  {self._symbol_label('📊', '')} Results  ")
 
 
     # ------------------------------------------------------------------
@@ -812,7 +833,7 @@ class SimGUI(tk.Tk):
                 self._output_tab.var_sm_mca.get().strip(),
             ),
         )
-        nb.add(self._run_tab, text="  ▶  Run  ")
+        nb.add(self._run_tab, text=f"  {self._symbol_label('▶', '')} Run  ")
 
     # ------------------------------------------------------------------
     #  Shared helpers
@@ -1062,7 +1083,7 @@ class _ExtractDialog(tk.Toplevel):
         btn_frm = ttk.Frame(self)
         btn_frm.grid(row=9, column=0, columnspan=3, pady=12)
 
-        ttk.Button(btn_frm, text="💾  Save CSV",
+        ttk.Button(btn_frm, text=f"{self._symbol_label('💾', '')} Save CSV",
                     command=self._do_extract).pack(side="left", padx=4)
         ttk.Button(btn_frm, text="Cancel",
                     command=self.destroy).pack(side="left", padx=4)
@@ -1130,7 +1151,7 @@ class _ExtractDialog(tk.Toplevel):
                                     parent=self)
             return
 
-        self.var_status.set("Extracting…")
+        self.var_status.set("Extracting...")
         self.update_idletasks()
 
         def _worker():

@@ -19,7 +19,7 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from beamontarget.gui.gui_widgets import make_card, resolve_path
+from beamontarget.gui.gui_widgets import make_card, resolve_path, symbol_text
 
 # ---------------------------------------------------------------------------
 #  ResultsTab
@@ -87,9 +87,9 @@ class ResultsTab(ttk.Frame):
 
         btn_frm = ttk.Frame(vis_card, style="Card.TFrame")
         btn_frm.pack(fill="x", pady=(8, 0))
-        ttk.Button(btn_frm, text="👁 Results (Open3D)", style="Secondary.TButton",
+        ttk.Button(btn_frm, text=f"{symbol_text('👁', '')} Results (Open3D)", style="Secondary.TButton",
                     command=self._view_results_o3d_fn).pack(side="left", padx=(0, 8))
-        ttk.Button(btn_frm, text="🔍 Results (ParaView)", style="Secondary.TButton",
+        ttk.Button(btn_frm, text=f"{symbol_text('🔍', '')} Results (ParaView)", style="Secondary.TButton",
                     command=self._view_results_fn).pack(side="left")
 
         # --- Summary Reports card ---
@@ -102,9 +102,9 @@ class ResultsTab(ttk.Frame):
         ttk.Checkbutton(sel_frm, text="Use smoothed if available",
                          variable=self.var_csv_use_smoothed,
                          style="Card.TCheckbutton").pack(side="left", padx=(0, 12))
-        ttk.Button(sel_frm, text="↻ Refresh", style="Secondary.TButton",
+        ttk.Button(sel_frm, text=f"{symbol_text('↻', '')} Refresh", style="Secondary.TButton",
                     command=self.refresh_csv_result_sets).pack(side="left", padx=(0, 4))
-        ttk.Button(sel_frm, text="📊 Load Selected", style="Secondary.TButton",
+        ttk.Button(sel_frm, text=f"{symbol_text('📊', '')} Load Selected", style="Secondary.TButton",
                     command=self._load_summary_csv).pack(side="left", padx=4)
 
         # Simulation selector
@@ -195,7 +195,7 @@ class ResultsTab(ttk.Frame):
         ttk.Button(btn_row_comp, text="None", style="Secondary.TButton",
                     command=self._chart_comp_select_none).pack(
                         side="left", padx=2)
-        ttk.Button(btn_row_comp, text="↻ Plot", style="Secondary.TButton",
+        ttk.Button(btn_row_comp, text=f"{symbol_text('↻', '')} Plot", style="Secondary.TButton",
                     command=self.update_csv_bar_plots).pack(
                         side="left", padx=2)
 
@@ -389,7 +389,7 @@ class ResultsTab(ttk.Frame):
 
         hdr = ttk.Frame(self._chart_comp_inner, style="Card.TFrame")
         hdr.pack(fill="x", padx=2, pady=(0, 2))
-        ttk.Label(hdr, text="✓", style="Card.TLabel", width=2).pack(side="left")
+        ttk.Label(hdr, text=symbol_text("✓", "Y"), style="Card.TLabel", width=2).pack(side="left")
         ttk.Label(hdr, text="Label", style="Card.TLabel", width=14).pack(
             side="left", padx=(2, 0))
         ttk.Label(hdr, text="Mult", style="Card.TLabel", width=5).pack(

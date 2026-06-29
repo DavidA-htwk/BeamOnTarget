@@ -3,6 +3,7 @@
 All tab modules import from here so that styling is consistent.
 """
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import ttk
 import os, sys
 from beamontarget.paths import get_project_root
@@ -14,6 +15,34 @@ _IS_FROZEN = getattr(sys, 'frozen', False)
 _SCRIPT_DIR = (os.path.dirname(sys.executable) if _IS_FROZEN
                else str(get_project_root()))
 _PROJECT_FOLDER = _SCRIPT_DIR
+_SYMBOL_FONT_FAMILIES = (
+    "Noto Sans Symbols 2",
+    "Noto Color Emoji",
+    "Segoe UI Emoji",
+    "Apple Color Emoji",
+    "Symbola",
+    "EmojiOne Color",
+)
+
+
+def choose_font_family():
+    """Return a font family that is available in the current Tk installation."""
+    available = set(tkfont.families())
+    for family in (*_SYMBOL_FONT_FAMILIES, "Noto Sans", "DejaVu Sans"):
+        if family in available:
+            return family
+    return "DejaVu Sans"
+
+
+def supports_symbol_fonts(font_family=None):
+    """Return True when the selected font can render emoji/symbol glyphs."""
+    family = font_family or choose_font_family()
+    return family in _SYMBOL_FONT_FAMILIES
+
+
+def symbol_text(symbol, fallback="", font_family=None):
+    """Return the symbol when supported, otherwise a plain-text fallback."""
+    return symbol if supports_symbol_fonts(font_family) else fallback
 
 
 def set_project_folder(path):

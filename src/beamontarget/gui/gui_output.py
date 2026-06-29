@@ -1,7 +1,7 @@
 """Output tab — output directory, file options, and post-processing smoother."""
 import tkinter as tk
 from tkinter import ttk
-from beamontarget.gui.gui_widgets import make_card, browse_directory
+from beamontarget.gui.gui_widgets import make_card, browse_directory, symbol_text
 
 class OutputTab(ttk.Frame):
     """Output paths, save options, and batch smoother configuration."""
@@ -45,7 +45,7 @@ class OutputTab(ttk.Frame):
                              style="Card.TCheckbutton").pack(anchor="w", pady=2)
             setattr(self, f"var_{key}", v)
 
-        ttk.Button(opts_card, text="📤 Extract results data…",
+        ttk.Button(opts_card, text=f"{symbol_text('📤', '')} Extract results data...",
                     style="Secondary.TButton",
                     command=self._open_extract_dialog).pack(
                         anchor="w", pady=(8, 0))
