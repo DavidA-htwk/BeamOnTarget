@@ -9,25 +9,6 @@ import os
 import glob
 from tqdm import tqdm
 
-def create_dummy_meshes():
-    """Creates coarse dummy meshes in the 'DUMMY' subfolder if they don't exist."""
-    dummy_dir = "DUMMY"
-    if not os.path.exists(dummy_dir):
-        os.makedirs(dummy_dir)
-        
-    cube_path = os.path.join(dummy_dir, "cube.stl")
-    if not os.path.exists(cube_path):
-        print("Creating coarse dummy mesh 'DUMMY/cube.stl'...")
-        mesh = trimesh.creation.box(extents=[1.0, 1.0, 1.0])
-        mesh.apply_translation([0, 0, 1.5])
-        mesh.export(cube_path)
-
-    sphere_path = os.path.join(dummy_dir, "sphere.stl")
-    if not os.path.exists(sphere_path):
-        print("Creating coarse dummy mesh 'DUMMY/sphere.stl'...")
-        mesh = trimesh.creation.icosphere(subdivisions=2)
-        mesh.apply_translation([0, 0, -1.5])
-        mesh.export(sphere_path)
 
 def load_scene(geometry_folders, cache_dir=None):
     """
@@ -43,7 +24,6 @@ def load_scene(geometry_folders, cache_dir=None):
     Returns:
         dict: A dictionary of {folder_name: [list_of_trimesh_objects]}.
     """
-    create_dummy_meshes() # Ensures dummy files/folder exist if needed
 
     # The main data structure is a dictionary, e.g.:
     # {'NEU': [mesh1, mesh2], 'RID': [mesh3, mesh4]}

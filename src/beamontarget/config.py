@@ -18,7 +18,7 @@ from beamontarget.paths import get_project_root
 # ---------------------------------------------------------------------------
 # Path to the JSON configuration file (kept at repository root)
 # ---------------------------------------------------------------------------
-_CONFIG_DIR = str(get_project_root())
+_CONFIG_DIR = str(get_project_root()/"CONFIGS")
 _CONFIG_FILE = os.path.join(_CONFIG_DIR, "config.json")
 
 # ---------------------------------------------------------------------------

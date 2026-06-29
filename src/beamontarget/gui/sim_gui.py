@@ -46,7 +46,7 @@ from beamontarget.gui.gui_run import RunTab
 _IS_FROZEN = getattr(sys, 'frozen', False)  # True when running from PyInstaller exe
 _SCRIPT_DIR = (os.path.dirname(sys.executable) if _IS_FROZEN
                else str(get_project_root()))
-_CONFIG_JSON = os.path.join(_SCRIPT_DIR, "config.json")
+_CONFIG_JSON = os.path.join(_SCRIPT_DIR, "CONFIGS", "config.json")
 _SPLASH_LOGO = os.path.join(_SCRIPT_DIR, "BOT_logo.png")
 _APP_ICON_ICO = os.path.join(_SCRIPT_DIR, "BOT_icon.ico")
 
