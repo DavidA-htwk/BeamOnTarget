@@ -212,7 +212,7 @@ class BeamCrossSectionReaction(ReactionModel):
         density_m3 = self._density_at_positions(positions_m)
 
         if self.manual_cross_sections:
-            # Use user-supplied constant cross-sections (scalar values in mÂ²)
+            # Use user-supplied constant cross-sections (scalar values in m²)
             sigmas = self.manual_cross_sections
             rates = {}
             for k, sigma in sigmas.items():

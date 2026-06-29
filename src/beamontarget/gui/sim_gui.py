@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # sim_gui.py
 """
 Tkinter GUI for managing the BeamOnTarget simulation.
@@ -125,7 +125,7 @@ def launch_paraview(script_content, pv_path, pv_module="ParaView"):
     """Write a temp script and launch ParaView.
 
     On Linux the EasyBuild module *pv_module* is loaded first (via
-    ``bash -lc 'ml â€¦'``) so that LD_LIBRARY_PATH etc. are set.
+    ``bash -lc 'ml …'``) so that LD_LIBRARY_PATH etc. are set.
 
     On Windows ParaView is invoked directly - no module system needed.
     """
@@ -451,9 +451,9 @@ class SimGUI(tk.Tk):
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label="Save Config", accelerator="Ctrl+S",
                               command=self._save)
-        file_menu.add_command(label="Save Config Asâ€¦", accelerator="Ctrl+Shift+S",
+        file_menu.add_command(label="Save Config As…", accelerator="Ctrl+Shift+S",
                               command=self._save_as)
-        file_menu.add_command(label="Load Configâ€¦", accelerator="Ctrl+O",
+        file_menu.add_command(label="Load Config…", accelerator="Ctrl+O",
                               command=self._load_config_file)
         file_menu.add_separator()
         file_menu.add_command(label="Quit", command=self.destroy)
@@ -461,18 +461,18 @@ class SimGUI(tk.Tk):
         self.config(menu=menubar)
 
         view_menu = tk.Menu(menubar, tearoff=0)
-        view_menu.add_command(label="View All (Open3D)â€¦",
+        view_menu.add_command(label="View All (Open3D)…",
                               command=self._view_all_o3d)
-        view_menu.add_command(label="View Geometry (Open3D)â€¦",
+        view_menu.add_command(label="View Geometry (Open3D)…",
                               command=self._view_geometry_o3d)
-        view_menu.add_command(label="View Results (Open3D)â€¦",
+        view_menu.add_command(label="View Results (Open3D)…",
                               command=self._view_results_o3d)
-        view_menu.add_command(label="View Sources (Open3D)â€¦",
+        view_menu.add_command(label="View Sources (Open3D)…",
                               command=self._view_sources_o3d)
         view_menu.add_separator()
-        view_menu.add_command(label="View Geometry (ParaView)â€¦",
+        view_menu.add_command(label="View Geometry (ParaView)…",
                               command=self._view_geometry)
-        view_menu.add_command(label="View Results (ParaView)â€¦",
+        view_menu.add_command(label="View Results (ParaView)…",
                               command=self._view_results)
         menubar.add_cascade(label="View", menu=view_menu)
 
@@ -485,7 +485,7 @@ class SimGUI(tk.Tk):
     # ------------------------------------------------------------------
     def _build_general_tab(self, nb):
         outer = ttk.Frame(nb)
-        nb.add(outer, text="  âš™  General  ")
+        nb.add(outer, text="  ⚙  General  ")
 
         # --- Tracking Method card ---
         method_card = self._make_card(outer, "Tracking Method", pady=(12, 10))
@@ -603,7 +603,7 @@ class SimGUI(tk.Tk):
             self._sync_project_folder(default_to_active=True)
 
         self.var_project_folder.trace_add("write", _on_project_folder_change)
-        ttk.Button(card, text="Browseâ€¦", style="Secondary.TButton",
+        ttk.Button(card, text="Browse…", style="Secondary.TButton",
                     command=self._browse_project_folder).grid(row=row, column=2)
 
         row += 1
@@ -623,7 +623,7 @@ class SimGUI(tk.Tk):
         self.var_pv_path = tk.StringVar(value=self.cfg.get("PARAVIEW_PATH", "paraview"))
         ttk.Entry(pv_card, textvariable=self.var_pv_path, width=50).grid(
             row=0, column=1, sticky="we", padx=(8, 4))
-        ttk.Button(pv_card, text="Browseâ€¦", style="Secondary.TButton",
+        ttk.Button(pv_card, text="Browse…", style="Secondary.TButton",
                     command=self._browse_pv).grid(row=0, column=2)
 
         # ParaView module (EasyBuild) - only shown on Linux
@@ -665,7 +665,7 @@ class SimGUI(tk.Tk):
             view_geometry_fn=self._view_geometry,
             view_geometry_o3d_fn=self._view_geometry_o3d,
         )
-        nb.add(self._geometry_tab, text="  ðŸ“  Geometry  ")
+        nb.add(self._geometry_tab, text="  📐  Geometry  ")
 
     # ------------------------------------------------------------------
     #  PARTICLES tab (delegated to gui_particles.py)
@@ -675,7 +675,7 @@ class SimGUI(tk.Tk):
             nb, self.cfg, self._colours,
             view_sources_o3d_fn=self._view_sources_o3d,
         )
-        nb.add(self._particles_tab, text="  ðŸ”¬  Particles  ")
+        nb.add(self._particles_tab, text="  🔬  Particles  ")
 
     @property
     def var_src_dir(self):
@@ -687,7 +687,7 @@ class SimGUI(tk.Tk):
     def _build_fields_tab(self, nb):
         self._fields_tab = FieldsTab(nb, self.cfg,
                                      get_collect_fn=self._collect)
-        nb.add(self._fields_tab, text="  ðŸ§²  Fields  ")
+        nb.add(self._fields_tab, text="  🧲  Fields  ")
 
     # ------------------------------------------------------------------
     #  REACTIONS tab (delegated to gui_reactions.py)
@@ -700,7 +700,7 @@ class SimGUI(tk.Tk):
             get_em_step=lambda: self.var_em_step.get(),
             get_collect_fn=self._collect,
         )
-        nb.add(self._reactions_tab, text="  âš›  Reactions  ")
+        nb.add(self._reactions_tab, text="  ➜  Reactions  ")
 
     # ------------------------------------------------------------------
     #  OUTPUT tab (delegated to gui_output.py)
@@ -710,7 +710,7 @@ class SimGUI(tk.Tk):
             nb, self.cfg, self._colours,
             open_extract_fn=self._open_extract_dialog,
         )
-        nb.add(self._output_tab, text="  ðŸ“  Output  ")
+        nb.add(self._output_tab, text="  📁  Output  ")
 
     @property
     def var_outdir(self):
@@ -792,7 +792,7 @@ class SimGUI(tk.Tk):
             open_extract_fn=self._open_extract_dialog,
             view_results_o3d_fn=self._view_results_o3d,
         )
-        nb.add(self._results_tab, text="  ðŸ“Š  Results  ")
+        nb.add(self._results_tab, text="  📊  Results  ")
 
 
     # ------------------------------------------------------------------
@@ -812,7 +812,7 @@ class SimGUI(tk.Tk):
                 self._output_tab.var_sm_mca.get().strip(),
             ),
         )
-        nb.add(self._run_tab, text="  â–¶  Run  ")
+        nb.add(self._run_tab, text="  ▶  Run  ")
 
     # ------------------------------------------------------------------
     #  Shared helpers
@@ -829,7 +829,7 @@ class SimGUI(tk.Tk):
             self._set_active_config_path(path)
             self._sync_project_folder(default_to_active=True)
             self._refresh_all_from_cfg()
-            self._log(f"âœ” Configuration loaded from {os.path.basename(path)}\n")
+            self._log(f"✔ Configuration loaded from {os.path.basename(path)}\n")
             self._set_status(f"Loaded config: {os.path.basename(path)}")
         except Exception as e:
             messagebox.showerror("Load Error", str(e))
@@ -883,7 +883,7 @@ class SimGUI(tk.Tk):
             self._sync_project_folder(default_to_active=True)
             self._sync_cfg_to_tabs()
             save_config(self.cfg, self._active_config_path)
-            self._log(f"âœ” Configuration saved to {os.path.basename(self._active_config_path)}\n")
+            self._log(f"✔ Configuration saved to {os.path.basename(self._active_config_path)}\n")
             self._set_status("Configuration saved")
         except Exception as e:
             messagebox.showerror("Save Error", str(e))
@@ -906,7 +906,7 @@ class SimGUI(tk.Tk):
             save_config(self.cfg, path)
             self._set_active_config_path(path)
             self._sync_project_folder(default_to_active=True)
-            self._log(f"âœ” Configuration saved to {os.path.basename(path)}\n")
+            self._log(f"✔ Configuration saved to {os.path.basename(path)}\n")
         except Exception as e:
             messagebox.showerror("Save Error", str(e))
 
@@ -983,7 +983,7 @@ class _ExtractDialog(tk.Toplevel):
         self.var_input = tk.StringVar()
         ttk.Entry(self, textvariable=self.var_input, width=48).grid(
             row=0, column=1, sticky="we", padx=(0, 4), pady=4)
-        ttk.Button(self, text="Browseâ€¦",
+        ttk.Button(self, text="Browse…",
                     command=lambda: self._browse_vtp(initial_dir)).grid(
             row=0, column=2, padx=(0, 12), pady=4)
 
@@ -996,7 +996,7 @@ class _ExtractDialog(tk.Toplevel):
         self.var_output = tk.StringVar()
         ttk.Entry(self, textvariable=self.var_output, width=48).grid(
             row=1, column=1, sticky="we", padx=(0, 4), pady=4)
-        ttk.Button(self, text="Browseâ€¦",
+        ttk.Button(self, text="Browse…",
                     command=self._browse_output).grid(
             row=1, column=2, padx=(0, 12), pady=4)
 
@@ -1062,7 +1062,7 @@ class _ExtractDialog(tk.Toplevel):
         btn_frm = ttk.Frame(self)
         btn_frm.grid(row=9, column=0, columnspan=3, pady=12)
 
-        ttk.Button(btn_frm, text="ðŸ’¾  Save CSV",
+        ttk.Button(btn_frm, text="💾  Save CSV",
                     command=self._do_extract).pack(side="left", padx=4)
         ttk.Button(btn_frm, text="Cancel",
                     command=self.destroy).pack(side="left", padx=4)
@@ -1130,7 +1130,7 @@ class _ExtractDialog(tk.Toplevel):
                                     parent=self)
             return
 
-        self.var_status.set("Extractingâ€¦")
+        self.var_status.set("Extracting…")
         self.update_idletasks()
 
         def _worker():
@@ -1206,7 +1206,7 @@ class _ExtractDialog(tk.Toplevel):
                 df.to_csv(output_csv, index=False, float_format="%.6e")
 
                 self.after(0, lambda: self.var_status.set(
-                    f"âœ” Saved {n_rows} rows to {os.path.basename(output_csv)}"))
+                    f"✔ Saved {n_rows} rows to {os.path.basename(output_csv)}"))
                 self.after(0, lambda: messagebox.showinfo(
                     "Done",
                     f"Extracted {n_rows} rows to:\n{output_csv}",

@@ -1,4 +1,4 @@
-﻿"""Particles tab â€” beam source configuration and beamlet file listing."""
+"""Particles tab — beam source configuration and beamlet file listing."""
 import os
 import glob
 import tkinter as tk
@@ -32,7 +32,7 @@ class ParticlesTab(ttk.Frame):
         self.var_src_dir = tk.StringVar(value=self.cfg.get("PARTICLE_SOURCE_DIR", "BEAM_CONFIGS"))
         ttk.Entry(card, textvariable=self.var_src_dir, width=30).grid(
             row=row, column=1, sticky="we", padx=(8, 4))
-        ttk.Button(card, text="Browseâ€¦", style="Secondary.TButton",
+        ttk.Button(card, text="Browse…", style="Secondary.TButton",
                     command=lambda: browse_directory(self.var_src_dir)).grid(
             row=row, column=2)
 
@@ -74,9 +74,9 @@ class ParticlesTab(ttk.Frame):
 
         bl_btn_frm = ttk.Frame(bl_card, style="Card.TFrame")
         bl_btn_frm.pack(fill="x")
-        ttk.Button(bl_btn_frm, text="â†» Refresh", style="Secondary.TButton",
+        ttk.Button(bl_btn_frm, text="↻ Refresh", style="Secondary.TButton",
                     command=self._refresh_bl_list).pack(side="left")
-        ttk.Button(bl_btn_frm, text="ðŸ‘ View Sources (Open3D)",
+        ttk.Button(bl_btn_frm, text="👁 View Sources (Open3D)",
                     style="Secondary.TButton",
                     command=self._view_sources_o3d).pack(side="right")
 

@@ -1,4 +1,4 @@
-﻿# config.py
+# config.py
 """
 Configuration loader for the particle simulation.
 
@@ -168,7 +168,7 @@ def _apply(d):
 
 
 # ---------------------------------------------------------------------------
-# Physics model â€” kept as a Python function (not serialisable to JSON).
+# Physics model — kept as a Python function (not serialisable to JSON).
 # The JSON stores the constant fraction; this wraps it as a callable.
 # ---------------------------------------------------------------------------
 

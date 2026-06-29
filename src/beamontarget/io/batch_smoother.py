@@ -1,4 +1,4 @@
-﻿# batch_smoother.py
+# batch_smoother.py
 """
 Batch processing tool to apply smoothing to all .vtp/.vtm simulation results
 found in a directory. Smoothed files are saved to a 'SMOOTHED' subfolder
@@ -28,7 +28,7 @@ OUTPUT_PREFIX = "smoothed_"
 # contribute to that cell's smoothed power density.
 SMOOTHING_RADIUS = 0.02
 
-# Maximum cell area (mÂ²) for smoothing.  Only cells smaller than this
+# Maximum cell area (m²) for smoothing.  Only cells smaller than this
 # threshold will be smoothed; larger cells keep their original density.
 # Set to None to smooth all cells.
 MAX_CELL_AREA = 1e-6
@@ -144,15 +144,15 @@ def batch_process_directory(input_dir, radius=None, max_cell_area=None, normal_t
             for filename, st in file_stats:
                 f.write(f"--- {filename} ---\n")
                 if st is None:
-                    f.write("  (no data â€” 'Deposited_Power_W' missing or read error)\n\n")
+                    f.write("  (no data — 'Deposited_Power_W' missing or read error)\n\n")
                     continue
                 f.write(f"  Total cells           : {st['n_cells']:,}\n")
                 f.write(f"  Cells smoothed        : {st['n_smoothed']:,}\n")
                 f.write(f"  Smoothing time        : {st['elapsed_s']:.2f} s\n")
                 f.write(f"  Total power           : {st['total_power_W']:.6g} W\n")
-                f.write(f"  Peak density (before) : {st['peak_density_before']:.6e} W/mÂ²\n")
-                f.write(f"  Peak density (after)  : {st['peak_density_after']:.6e} W/mÂ²\n")
-                f.write(f"  Cell area range       : [{st['min_area_m2']:.4e}, {st['max_area_m2']:.4e}] mÂ²\n")
+                f.write(f"  Peak density (before) : {st['peak_density_before']:.6e} W/m²\n")
+                f.write(f"  Peak density (after)  : {st['peak_density_after']:.6e} W/m²\n")
+                f.write(f"  Cell area range       : [{st['min_area_m2']:.4e}, {st['max_area_m2']:.4e}] m²\n")
                 f.write("\n")
 
         print(f"  Log written to: {log_path}")
@@ -220,7 +220,7 @@ if __name__ == "__main__":
         '-a', '--max_cell_area',
         type=float,
         default=MAX_CELL_AREA,
-        help=f"Only smooth cells with area below this threshold (mÂ²). Defaults to {MAX_CELL_AREA}. Set to 0 to smooth all cells."
+        help=f"Only smooth cells with area below this threshold (m²). Defaults to {MAX_CELL_AREA}. Set to 0 to smooth all cells."
     )
     args = parser.parse_args()
     

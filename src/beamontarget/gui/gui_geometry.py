@@ -1,4 +1,4 @@
-﻿"""Geometry tab â€” editable folder table with viewer buttons and 2-D bounding-box plot."""
+"""Geometry tab — editable folder table with viewer buttons and 2-D bounding-box plot."""
 import glob
 import os
 import struct
@@ -65,15 +65,15 @@ class GeometryTab(ttk.Frame):
         # Buttons
         btn_frm = ttk.Frame(card, style="Card.TFrame")
         btn_frm.pack(fill="x", pady=(10, 0))
-        ttk.Button(btn_frm, text="ï¼‹ Add Folderâ€¦", style="Secondary.TButton",
+        ttk.Button(btn_frm, text="+ Add Folder…", style="Secondary.TButton",
                     command=self._add_geo_folder).pack(side="left", padx=(0, 4))
-        ttk.Button(btn_frm, text="âœŽ Edit Selectedâ€¦", style="Secondary.TButton",
+        ttk.Button(btn_frm, text="✎ Edit Selected…", style="Secondary.TButton",
                     command=self._edit_geo_folder).pack(side="left", padx=4)
-        ttk.Button(btn_frm, text="âœ• Remove", style="Secondary.TButton",
+        ttk.Button(btn_frm, text="✕ Remove", style="Secondary.TButton",
                     command=self._remove_geo_folder).pack(side="left", padx=4)
-        ttk.Button(btn_frm, text="ðŸ” ParaView", style="Secondary.TButton",
+        ttk.Button(btn_frm, text="🔍 ParaView", style="Secondary.TButton",
                     command=self._view_geometry).pack(side="right", padx=(4, 0))
-        ttk.Button(btn_frm, text="ðŸ”· Open3D", style="Secondary.TButton",
+        ttk.Button(btn_frm, text="🔷 Open3D", style="Secondary.TButton",
                     command=self._view_geometry_o3d).pack(side="right", padx=4)
 
         # --- 2-D Bounding-box plot ---
@@ -83,13 +83,13 @@ class GeometryTab(ttk.Frame):
         ctrl_frm.pack(fill="x", pady=(0, 6))
 
         ttk.Label(ctrl_frm, text="Projection:", style="Card.TLabel").pack(side="left")
-        self._var_projection = tk.StringVar(value="Xâ€“Z")
+        self._var_projection = tk.StringVar(value="X–Z")
         proj_combo = ttk.Combobox(ctrl_frm, textvariable=self._var_projection,
-                                   values=["Xâ€“Y", "Xâ€“Z", "Yâ€“Z"],
+                                   values=["X–Y", "X–Z", "Y–Z"],
                                    state="readonly", width=8)
         proj_combo.pack(side="left", padx=(6, 12))
 
-        ttk.Button(ctrl_frm, text="â†» Refresh Plot", style="Secondary.TButton",
+        ttk.Button(ctrl_frm, text="↻ Refresh Plot", style="Secondary.TButton",
                     command=self._update_plot).pack(side="left")
 
         self._fig = Figure(figsize=(6, 3.2), dpi=100)
@@ -107,9 +107,9 @@ class GeometryTab(ttk.Frame):
         for folder, s in self.cfg.get("GEOMETRY_FOLDERS", {}).items():
             self.geo_tree.insert("", "end", values=(
                 folder, s.get("scale", 1), s.get("target_length", 1.0),
-                "âœ“" if s.get("save_details") else "", "âœ“" if s.get("is_diagnostic") else "",
-                "âœ“" if s.get("save_impact_data") else "",
-                s.get("max_impact_records") if s.get("max_impact_records") is not None else "â€”"))
+                "✓" if s.get("save_details") else "", "✓" if s.get("is_diagnostic") else "",
+                "✓" if s.get("save_impact_data") else "",
+                s.get("max_impact_records") if s.get("max_impact_records") is not None else "—"))
 
     def _add_geo_folder(self):
         self._geo_dialog(None)
@@ -165,7 +165,7 @@ class GeometryTab(ttk.Frame):
                 if existing_folder:
                     e.config(state="disabled")
 
-        ttk.Button(folder_frm, text="Browseâ€¦", command=_browse_geo_folder).pack(
+        ttk.Button(folder_frm, text="Browse…", command=_browse_geo_folder).pack(
             side="left", padx=(4, 0)
         )
         if existing_folder:
@@ -248,7 +248,7 @@ class GeometryTab(ttk.Frame):
             fh.seek(0, 2)
             actual = fh.tell()
             if actual == expected and n_tri > 0:
-                # Binary STL â€” fast numpy read
+                # Binary STL — fast numpy read
                 fh.seek(84)
                 dtype = np.dtype([
                     ("normal", "<f4", (3,)),
@@ -306,10 +306,10 @@ class GeometryTab(ttk.Frame):
         ax.clear()
 
         proj = self._var_projection.get()
-        idx_map = {"Xâ€“Y": (0, 1), "Xâ€“Z": (0, 2), "Yâ€“Z": (1, 2)}
-        axis_labels = {"Xâ€“Y": ("X (m)", "Y (m)"),
-                       "Xâ€“Z": ("X (m)", "Z (m)"),
-                       "Yâ€“Z": ("Y (m)", "Z (m)")}
+        idx_map = {"X–Y": (0, 1), "X–Z": (0, 2), "Y–Z": (1, 2)}
+        axis_labels = {"X–Y": ("X (m)", "Y (m)"),
+                       "X–Z": ("X (m)", "Z (m)"),
+                       "Y–Z": ("Y (m)", "Z (m)")}
         ix, iy = idx_map.get(proj, (0, 2))
         xlabel, ylabel = axis_labels.get(proj, ("", ""))
 
@@ -341,7 +341,7 @@ class GeometryTab(ttk.Frame):
 
         ax.set_xlabel(xlabel, fontsize=9)
         ax.set_ylabel(ylabel, fontsize=9)
-        ax.set_title(f"Bounding Boxes â€” {proj}", fontsize=10, fontweight="bold")
+        ax.set_title(f"Bounding Boxes — {proj}", fontsize=10, fontweight="bold")
         ax.grid(True, linewidth=0.4, alpha=0.5)
         self._fig.tight_layout()
         self._canvas.draw_idle()

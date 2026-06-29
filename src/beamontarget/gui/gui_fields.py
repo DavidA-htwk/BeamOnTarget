@@ -1,4 +1,4 @@
-﻿"""Fields tab â€” per-component EM field configuration.
+"""Fields tab — per-component EM field configuration.
 
 Provides :class:`FieldsTab`, a ``ttk.Frame`` that can be embedded in the
 main notebook.  It exposes ``collect(d)`` and ``refresh(c)`` so the host
@@ -110,7 +110,7 @@ class FieldsTab(ttk.Frame):
         lr_row.pack(fill="x")
         ttk.Button(lr_row, text="Calculate", style="Secondary.TButton",
                     command=self._calc_larmor_radius).pack(side="left")
-        self._var_larmor = tk.StringVar(value="â€”")
+        self._var_larmor = tk.StringVar(value="—")
         ttk.Label(lr_row, textvariable=self._var_larmor,
                   style="Card.TLabel", font=("Segoe UI", 10)).pack(
             side="left", padx=(12, 0))
@@ -285,11 +285,11 @@ class FieldsTab(ttk.Frame):
             max_b = float(np.max(b_norm)) if b_norm.size > 0 else 0.0
 
             if max_b <= 0:
-                self._var_larmor.set("r_L = âˆž  (|B| = 0)")
+                self._var_larmor.set("r_L = ∞  (|B| = 0)")
             else:
                 r_l = mass * speed / (q_c * max_b)
                 self._var_larmor.set(
-                    f"r_L â‰ˆ {r_l:.4e} m   |   v = {speed:.3e} m/s   |   |B| = {max_b:.3e} T"
+                    f"r_L ≈ {r_l:.4e} m   |   v = {speed:.3e} m/s   |   |B| = {max_b:.3e} T"
                 )
         except Exception as exc:
             self._var_larmor.set(f"Error: {exc}")
@@ -322,7 +322,7 @@ class FieldsTab(ttk.Frame):
         file_frm.grid(row=row, column=2, sticky="we", padx=(8, 0), pady=3)
         ttk.Entry(file_frm, textvariable=file_var, width=28).pack(
             side="left", fill="x", expand=True)
-        ttk.Button(file_frm, text="Browseâ€¦", style="Secondary.TButton",
+        ttk.Button(file_frm, text="Browse…", style="Secondary.TButton",
                     command=lambda fv=file_var: self._browse_fld_file(fv)).pack(
                         side="left", padx=(4, 0))
 
@@ -345,7 +345,7 @@ class FieldsTab(ttk.Frame):
         scale_var = tk.StringVar(value=str(init_cfg.get("scale", 1.0)))
         scale_frm = ttk.Frame(card, style="Card.TFrame")
         scale_frm.grid(row=row, column=3, sticky="e", padx=(8, 0), pady=3)
-        ttk.Label(scale_frm, text="Ã—", style="Card.TLabel").pack(side="left")
+        ttk.Label(scale_frm, text="×", style="Card.TLabel").pack(side="left")
         ttk.Entry(scale_frm, textvariable=scale_var, width=6).pack(
             side="left", padx=(2, 0))
 

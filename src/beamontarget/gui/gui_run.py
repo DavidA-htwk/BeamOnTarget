@@ -1,4 +1,4 @@
-﻿"""Run tab - save/load config, execute simulation, and stream console logs."""
+"""Run tab - save/load config, execute simulation, and stream console logs."""
 import datetime
 import os
 import sys
@@ -81,24 +81,24 @@ class RunTab(ttk.Frame):
         btn_row = ttk.Frame(btn_card, style="Card.TFrame")
         btn_row.pack(fill="x")
 
-        ttk.Button(btn_row, text="ðŸ’¾ Save Config", style="Secondary.TButton",
+        ttk.Button(btn_row, text="💾 Save Config", style="Secondary.TButton",
                     command=self._save_ext).pack(side="left", padx=(0, 4))
-        ttk.Button(btn_row, text="ðŸ’¾ Save Asâ€¦", style="Secondary.TButton",
+        ttk.Button(btn_row, text="💾 Save As…", style="Secondary.TButton",
                     command=self._save_as_ext).pack(side="left", padx=4)
-        ttk.Button(btn_row, text="ðŸ“‚ Load Configâ€¦", style="Secondary.TButton",
+        ttk.Button(btn_row, text="📂 Load Config…", style="Secondary.TButton",
                     command=self._load_config_ext).pack(side="left", padx=4)
 
         ttk.Separator(btn_row, orient="vertical").pack(side="left", fill="y",
                                                          padx=12, pady=2)
 
-        ttk.Button(btn_row, text="â–¶  Run Simulation", style="Accent.TButton",
+        ttk.Button(btn_row, text="▶  Run Simulation", style="Accent.TButton",
                     command=self._run_sim).pack(side="left", padx=4)
-        ttk.Button(btn_row, text="â‰ˆ  Run Smoothing Only", style="Secondary.TButton",
+        ttk.Button(btn_row, text="≈  Run Smoothing Only", style="Secondary.TButton",
                 command=self._run_smoothing_only).pack(side="left", padx=4)
-        ttk.Button(btn_row, text="â¹  Stop", style="Danger.TButton",
+        ttk.Button(btn_row, text="⏹  Stop", style="Danger.TButton",
                     command=self._stop_sim).pack(side="left", padx=4)
 
-        # SDCC checkbox (Linux HPC only â€” hidden on Windows)
+        # SDCC checkbox (Linux HPC only — hidden on Windows)
         self.var_sdcc = tk.BooleanVar(value=False)
         if sys.platform != "win32":
             ttk.Checkbutton(btn_card, text="Run on SLURM server (srun --exclusive)",
@@ -195,8 +195,8 @@ class RunTab(ttk.Frame):
         self.log_text.delete("1.0", "end")
         self.log_text.config(state="disabled")
         mode_label = "simulation" if mode == "simulation" else "smoothing"
-        self._log(f"â–¶ Starting {mode_label} queue with {len(cfg_paths)} configuration file(s)â€¦\n\n")
-        self._set_status(f"{mode_label.capitalize()} queue runningâ€¦")
+        self._log(f"▶ Starting {mode_label} queue with {len(cfg_paths)} configuration file(s)…\n\n")
+        self._set_status(f"{mode_label.capitalize()} queue running…")
 
         def _worker():
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -221,24 +221,24 @@ class RunTab(ttk.Frame):
                         rc = self._run_single_job(mode, cfg_path, _tee)
                         if rc == 0:
                             successes += 1
-                            _tee("âœ” Completed successfully.\n")
+                            _tee("✔ Completed successfully.\n")
                         else:
                             failures += 1
-                            _tee(f"âœ– Failed with return code {rc}.\n")
+                            _tee(f"✖ Failed with return code {rc}.\n")
                 except Exception as e:
-                    _tee(f"\nâœ– Error: {e}\n")
+                    _tee(f"\n✖ Error: {e}\n")
                     self.after(0, lambda: self._set_status(f"{mode_label.capitalize()} error"))
                     return
 
                 if self._stop_requested:
                     self.after(0, lambda: self._set_status(f"{mode_label.capitalize()} queue stopped"))
-                    _tee("\nâ¹ Queue stopped by user.\n")
+                    _tee("\n⏹ Queue stopped by user.\n")
                 elif failures == 0:
                     self.after(0, lambda: self._set_status(f"{mode_label.capitalize()} queue completed successfully"))
-                    _tee(f"\nâœ” Queue complete: {successes} succeeded, {failures} failed.\n")
+                    _tee(f"\n✔ Queue complete: {successes} succeeded, {failures} failed.\n")
                 else:
                     self.after(0, lambda: self._set_status(f"{mode_label.capitalize()} queue completed with failures"))
-                    _tee(f"\nâœ– Queue complete: {successes} succeeded, {failures} failed.\n")
+                    _tee(f"\n✖ Queue complete: {successes} succeeded, {failures} failed.\n")
 
         threading.Thread(target=_worker, daemon=True).start()
 
@@ -291,7 +291,7 @@ class RunTab(ttk.Frame):
         self._stop_requested = True
         if self._sim_process and self._sim_process.poll() is None:
             self._sim_process.terminate()
-            self._log("\nâ¹ Simulation terminated by user.\n")
+            self._log("\n⏹ Simulation terminated by user.\n")
             self._set_status("Simulation stopped")
 
     def _log(self, text):

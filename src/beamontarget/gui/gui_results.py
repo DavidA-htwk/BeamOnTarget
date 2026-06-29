@@ -1,4 +1,4 @@
-﻿"""Results tab â€” visualisation, summary CSV reports, comparison bar charts.
+"""Results tab — visualisation, summary CSV reports, comparison bar charts.
 
 Provides :class:`ResultsTab`, a ``ttk.Frame`` that the main window embeds
 in the notebook.  External dependencies (output dir, ParaView, pick-dialog,
@@ -44,7 +44,7 @@ class ResultsTab(ttk.Frame):
         top_pw.pack(fill="both", expand=True)
 
         # ===========================================================
-        # LEFT side â€” scrollable cards
+        # LEFT side — scrollable cards
         # ===========================================================
         left_wrapper = ttk.Frame(top_pw)
         top_pw.add(left_wrapper, weight=1)
@@ -87,9 +87,9 @@ class ResultsTab(ttk.Frame):
 
         btn_frm = ttk.Frame(vis_card, style="Card.TFrame")
         btn_frm.pack(fill="x", pady=(8, 0))
-        ttk.Button(btn_frm, text="ðŸ‘ Results (Open3D)", style="Secondary.TButton",
+        ttk.Button(btn_frm, text="👁 Results (Open3D)", style="Secondary.TButton",
                     command=self._view_results_o3d_fn).pack(side="left", padx=(0, 8))
-        ttk.Button(btn_frm, text="ðŸ” Results (ParaView)", style="Secondary.TButton",
+        ttk.Button(btn_frm, text="🔍 Results (ParaView)", style="Secondary.TButton",
                     command=self._view_results_fn).pack(side="left")
 
         # --- Summary Reports card ---
@@ -102,9 +102,9 @@ class ResultsTab(ttk.Frame):
         ttk.Checkbutton(sel_frm, text="Use smoothed if available",
                          variable=self.var_csv_use_smoothed,
                          style="Card.TCheckbutton").pack(side="left", padx=(0, 12))
-        ttk.Button(sel_frm, text="â†» Refresh", style="Secondary.TButton",
+        ttk.Button(sel_frm, text="↻ Refresh", style="Secondary.TButton",
                     command=self.refresh_csv_result_sets).pack(side="left", padx=(0, 4))
-        ttk.Button(sel_frm, text="ðŸ“Š Load Selected", style="Secondary.TButton",
+        ttk.Button(sel_frm, text="📊 Load Selected", style="Secondary.TButton",
                     command=self._load_summary_csv).pack(side="left", padx=4)
 
         # Simulation selector
@@ -145,7 +145,7 @@ class ResultsTab(ttk.Frame):
                                       show="headings", height=8)
         self.csv_tree.heading("object", text="Object")
         self.csv_tree.heading("total_power", text="Total Power [W]")
-        self.csv_tree.heading("peak_density", text="Peak Density [W/mÂ²]")
+        self.csv_tree.heading("peak_density", text="Peak Density [W/m²]")
         self.csv_tree.heading("source", text="Source")
         self.csv_tree.column("object", width=160, anchor="w")
         self.csv_tree.column("total_power", width=130, anchor="e")
@@ -170,7 +170,7 @@ class ResultsTab(ttk.Frame):
                   foreground=colours["dim"]).pack(anchor="w", pady=(4, 0))
 
         # ===========================================================
-        # RIGHT side â€” component filter + matplotlib bar charts
+        # RIGHT side — component filter + matplotlib bar charts
         # ===========================================================
         right_frm = ttk.Frame(top_pw, style="Card.TFrame", padding=8)
         top_pw.add(right_frm, weight=1)
@@ -195,7 +195,7 @@ class ResultsTab(ttk.Frame):
         ttk.Button(btn_row_comp, text="None", style="Secondary.TButton",
                     command=self._chart_comp_select_none).pack(
                         side="left", padx=2)
-        ttk.Button(btn_row_comp, text="â†» Plot", style="Secondary.TButton",
+        ttk.Button(btn_row_comp, text="↻ Plot", style="Secondary.TButton",
                     command=self.update_csv_bar_plots).pack(
                         side="left", padx=2)
 
@@ -204,8 +204,8 @@ class ResultsTab(ttk.Frame):
         ttk.Label(sp_frm, text="Species:", style="Card.TLabel").pack(side="left")
         self.var_chart_species = tk.StringVar(value="Total")
         ttk.Combobox(sp_frm, textvariable=self.var_chart_species,
-                      values=["Total", "Hâ»/Dâ» (negative)", "Hâ°/Dâ° (neutrals)",
-                              "Hâº/Dâº (positive)"],
+                      values=["Total", "H⁻/D⁻ (negative)", "H⁰/D⁰ (neutrals)",
+                              "H⁺/D⁺ (positive)"],
                       state="readonly", width=18).pack(side="left", padx=(4, 0))
 
         log_frm = ttk.Frame(comp_frm, style="Card.TFrame")
@@ -254,7 +254,7 @@ class ResultsTab(ttk.Frame):
         self._csv_canvas_mpl.mpl_connect("motion_notify_event", self._on_csv_plot_hover)
         self._csv_canvas_mpl.mpl_connect("figure_leave_event", self._on_csv_plot_leave)
 
-        self._csv_ax_peak.set_title("Peak Heat Load [W/mÂ²]", fontsize=10)
+        self._csv_ax_peak.set_title("Peak Heat Load [W/m²]", fontsize=10)
         self._csv_ax_power.set_title("Total Power [W]", fontsize=10)
         self._csv_fig.tight_layout()
         self._csv_canvas_mpl.draw()
@@ -322,7 +322,7 @@ class ResultsTab(ttk.Frame):
 
         if event.inaxes == ax_peak:
             targets = self._csv_bar_hover_targets.get("peak", [])
-            unit = "W/mÂ²"
+            unit = "W/m²"
         elif event.inaxes == ax_power:
             targets = self._csv_bar_hover_targets.get("power", [])
             unit = "W"
@@ -389,7 +389,7 @@ class ResultsTab(ttk.Frame):
 
         hdr = ttk.Frame(self._chart_comp_inner, style="Card.TFrame")
         hdr.pack(fill="x", padx=2, pady=(0, 2))
-        ttk.Label(hdr, text="âœ“", style="Card.TLabel", width=2).pack(side="left")
+        ttk.Label(hdr, text="✓", style="Card.TLabel", width=2).pack(side="left")
         ttk.Label(hdr, text="Label", style="Card.TLabel", width=14).pack(
             side="left", padx=(2, 0))
         ttk.Label(hdr, text="Mult", style="Card.TLabel", width=5).pack(
@@ -599,7 +599,7 @@ class ResultsTab(ttk.Frame):
         if n_errors:
             info_parts.append(f"{n_errors} failed")
         if peak_max > 0:
-            info_parts.append(f"Max peak = {peak_max:.4e} W/mÂ²")
+            info_parts.append(f"Max peak = {peak_max:.4e} W/m²")
         self.var_csv_status.set("  |  ".join(info_parts))
 
         self._refresh_chart_comp_list()
@@ -618,7 +618,7 @@ class ResultsTab(ttk.Frame):
 
         data = self._csv_plot_data
         if not data:
-            ax_peak.set_title("Peak Heat Load [W/mÂ²]", fontsize=10)
+            ax_peak.set_title("Peak Heat Load [W/m²]", fontsize=10)
             ax_power.set_title("Total Power [W]", fontsize=10)
             self._csv_fig.tight_layout()
             self._csv_canvas_mpl.draw()
@@ -626,9 +626,9 @@ class ResultsTab(ttk.Frame):
 
         sp_sel = self.var_chart_species.get()
         _species_map = {
-            "Hâ»/Dâ» (negative)": "H-",
-            "Hâ°/Dâ° (neutrals)": "H0",
-            "Hâº/Dâº (positive)": "H+",
+            "H⁻/D⁻ (negative)": "H-",
+            "H⁰/D⁰ (neutrals)": "H0",
+            "H⁺/D⁺ (positive)": "H+",
         }
         sp_suffix = _species_map.get(sp_sel)
         tp_key = f"tp_{sp_suffix}" if sp_suffix else "tp"
@@ -695,7 +695,7 @@ class ResultsTab(ttk.Frame):
                     powers.append(0.0)
 
             offset = (si - (n_sims - 1) / 2) * bar_width
-            label = sim if len(sim) <= 30 else sim[:27] + "â€¦"
+            label = sim if len(sim) <= 30 else sim[:27] + "…"
             peak_bars = ax_peak.bar(x + offset, peaks, bar_width * 0.9,
                                     label=label, color=colours[si], edgecolor="white",
                                     linewidth=0.5)
@@ -721,7 +721,7 @@ class ResultsTab(ttk.Frame):
                 display_labels.append(obj)
 
         for ax, title, unit, log_var in [
-            (ax_peak, "Peak Heat Load", "W/mÂ²", self.var_chart_log_peak),
+            (ax_peak, "Peak Heat Load", "W/m²", self.var_chart_log_peak),
             (ax_power, "Total Deposited Power", "W", self.var_chart_log_power),
         ]:
             ax.set_title(f"{title}{species_label} [{unit}]",

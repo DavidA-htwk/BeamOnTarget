@@ -1,5 +1,5 @@
-﻿"""
-EM particle tracing (Phase 1) â€” Boris integration without geometry intersection.
+"""
+EM particle tracing (Phase 1) — Boris integration without geometry intersection.
 Outputs trajectory segments for deferred BVH checking in Phase 2.
 """
 
@@ -106,7 +106,7 @@ def trace_particle_batch_em_only(
     travel_distance = np.zeros(len(positions), dtype=np.float64)
     active = np.ones(len(positions), dtype=bool)
 
-    # Per-field accumulators â€” one list.append per field per step (no Python per-particle loop)
+    # Per-field accumulators — one list.append per field per step (no Python per-particle loop)
     seg_pid  = []
     seg_sidx = []
     seg_spos = []
@@ -170,7 +170,7 @@ def trace_particle_batch_em_only(
         m = species.mass_kg[active_idx]
         q_state = species.charge_state_e[active_idx]
 
-        # Speed via einsum â€” avoids np.linalg.norm overhead
+        # Speed via einsum — avoids np.linalg.norm overhead
         speed = np.sqrt(np.maximum(np.einsum('ij,ij->i', v, v), 0.0))
         valid = speed > 1e-12
         speed_safe = np.where(valid, speed, 1.0)
@@ -185,7 +185,7 @@ def trace_particle_batch_em_only(
         q_over_m = (q_state * ELEMENTARY_CHARGE_C) / np.maximum(m, 1e-30)
         v_next = boris_push(v, q_over_m, dt, e_field, b_field)
 
-        # Boris conserves speed â€” seg_len = em_step_length_m; no second norm needed
+        # Boris conserves speed — seg_len = em_step_length_m; no second norm needed
         p_next = p + v_next * dt[:, np.newaxis]
         if not np.all(valid):
             p_next[~valid] = p[~valid]  # zero-speed particles stay in place
@@ -244,7 +244,7 @@ def trace_particle_batch_em_only(
         seg_len_valid = np.sqrt(np.maximum(np.einsum('ij,ij->i', seg_delta_valid, seg_delta_valid), 0.0))
         travel_distance[valid_gidx] += seg_len_valid
 
-        # Vectorized segment accumulation â€” one list.append per field per step
+        # Vectorized segment accumulation — one list.append per field per step
         if valid_gidx.size > 0:
             seg_pid.append(valid_gidx)
             seg_sidx.append(np.full(valid_gidx.size, step_idx, dtype=np.int32))

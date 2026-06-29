@@ -79,7 +79,7 @@ def main():
         type=float,
         default=config.SMOOTHING_MAX_CELL_AREA if config.SMOOTHING_MAX_CELL_AREA else 0,
         help=(
-            f"Only smooth cells with area below this threshold (mÂ²).\n"
+            f"Only smooth cells with area below this threshold (m²).\n"
             f"Defaults to {config.SMOOTHING_MAX_CELL_AREA}.  Set to 0 to smooth all cells with power."
         ),
     )

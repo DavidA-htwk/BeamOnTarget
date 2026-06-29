@@ -1,4 +1,4 @@
-﻿"""Reactions tab â€” background gas density, cross-section settings, diagnostic plots.
+"""Reactions tab — background gas density, cross-section settings, diagnostic plots.
 
 Provides :class:`ReactionsTab`, a ``ttk.Frame`` that the main window embeds
 in the notebook.  Exposes ``collect(d, is_em)`` and ``refresh(c)`` so the
@@ -39,7 +39,7 @@ class ReactionsTab(ttk.Frame):
         top_pw.pack(fill="both", expand=True)
 
         # ===========================================================
-        # LEFT side â€” scrollable cards
+        # LEFT side — scrollable cards
         # ===========================================================
         left_wrapper = ttk.Frame(top_pw)
         top_pw.add(left_wrapper, weight=1)
@@ -78,7 +78,7 @@ class ReactionsTab(ttk.Frame):
         row += 1
         self._dens_uniform_frame = ttk.Frame(dens_card, style="Card.TFrame")
         self._dens_uniform_frame.grid(row=row, column=0, columnspan=3, sticky="we", pady=2)
-        ttk.Label(self._dens_uniform_frame, text="Density (mâ»Â³):",
+        ttk.Label(self._dens_uniform_frame, text="Density (m⁻³):",
                   style="Card.TLabel").pack(side="left")
         self.var_bg_density = tk.DoubleVar(value=rm.get("background_density_m3", 0.0))
         ttk.Entry(self._dens_uniform_frame, textvariable=self.var_bg_density,
@@ -93,7 +93,7 @@ class ReactionsTab(ttk.Frame):
         self.var_density_file = tk.StringVar(value=rm.get("density_profile_file", ""))
         ttk.Entry(self._dens_profile_frame, textvariable=self.var_density_file,
                   width=30).pack(side="left", fill="x", expand=True, padx=(8, 4))
-        ttk.Button(self._dens_profile_frame, text="Browseâ€¦",
+        ttk.Button(self._dens_profile_frame, text="Browse…",
                     style="Secondary.TButton",
                     command=self._browse_density_file).pack(side="left")
 
@@ -135,21 +135,21 @@ class ReactionsTab(ttk.Frame):
         cs_card = make_card(outer, "Reaction Definitions (Cross Sections)")
 
         self._cs_channels = [
-            ("Hâ»/Dâ» â†’ Hâ°/Dâ°", "Single stripping",  "single_strip_neg_to_neutral"),
-            ("Hâ»/Dâ» â†’ Hâº/Dâº", "Double stripping",   "double_strip_neg_to_positive"),
-            ("Hâ°/Dâ° â†’ Hâº/Dâº", "Neutral stripping",  "strip_neutral_to_positive"),
-            ("Hâº/Dâº â†’ Hâ°/Dâ°", "Charge exchange",    "charge_exchange_pos_to_neutral"),
+            ("H⁻/D⁻ → H⁰/D⁰", "Single stripping",  "single_strip_neg_to_neutral"),
+            ("H⁻/D⁻ → H⁺/D⁺", "Double stripping",   "double_strip_neg_to_positive"),
+            ("H⁰/D⁰ → H⁺/D⁺", "Neutral stripping",  "strip_neutral_to_positive"),
+            ("H⁺/D⁺ → H⁰/D⁰", "Charge exchange",    "charge_exchange_pos_to_neutral"),
         ]
         manual_cs = rm.get("manual_cross_sections") or {}
         has_manual = bool(manual_cs)
-        cs_mode_init = "Manual (mÂ²)" if has_manual else "Built-in polynomial fit"
+        cs_mode_init = "Manual (m²)" if has_manual else "Built-in polynomial fit"
 
         row = 0
         ttk.Label(cs_card, text="Source:", style="Card.TLabel").grid(
             row=row, column=0, sticky="w", pady=4)
         self.var_cs_mode = tk.StringVar(value=cs_mode_init)
         ttk.Combobox(cs_card, textvariable=self.var_cs_mode,
-                      values=["Built-in polynomial fit", "Manual (mÂ²)"],
+                      values=["Built-in polynomial fit", "Manual (m²)"],
                       state="readonly", width=24).grid(
             row=row, column=1, columnspan=2, sticky="w", padx=(8, 0))
 
@@ -183,12 +183,12 @@ class ReactionsTab(ttk.Frame):
             ent = ttk.Entry(cs_card, textvariable=var, width=12)
             ent.grid(row=r, column=2, sticky="w", padx=(8, 0), pady=2)
             self._cs_entry_widgets[key] = ent
-            unit = ttk.Label(cs_card, text="mÂ²", style="Card.TLabel")
+            unit = ttk.Label(cs_card, text="m²", style="Card.TLabel")
             unit.grid(row=r, column=3, sticky="w", padx=(4, 0), pady=2)
             self._cs_unit_labels[key] = unit
 
         def _on_cs_mode(*_):
-            is_manual = self.var_cs_mode.get() == "Manual (mÂ²)"
+            is_manual = self.var_cs_mode.get() == "Manual (m²)"
             for key in self._cs_manual_vars:
                 if is_manual:
                     self._cs_source_labels[key].grid_remove()
@@ -208,7 +208,7 @@ class ReactionsTab(ttk.Frame):
         cs_card.columnconfigure(1, weight=0)
 
         # ===========================================================
-        # RIGHT side â€” embedded diagnostic plots
+        # RIGHT side — embedded diagnostic plots
         # ===========================================================
         right_frm = ttk.Frame(top_pw, style="Card.TFrame", padding=8)
         top_pw.add(right_frm, weight=1)
@@ -244,7 +244,7 @@ class ReactionsTab(ttk.Frame):
         mfp_row.pack(fill="x", pady=(4, 6))
         ttk.Button(mfp_row, text="Calc Mean Free Path", style="Secondary.TButton",
                     command=self._calc_mean_free_path).pack(side="left")
-        self._var_mfp = tk.StringVar(value="â€”")
+        self._var_mfp = tk.StringVar(value="—")
         ttk.Label(mfp_row, textvariable=self._var_mfp,
                   style="Card.TLabel", font=("Segoe UI", 9)).pack(
             side="left", padx=(10, 0))
@@ -272,7 +272,7 @@ class ReactionsTab(ttk.Frame):
                 "density_profile_scale": self.var_density_profile_scale.get(),
                 "density_profile_direction": dd_vec,
             }
-            if self.var_cs_mode.get() == "Manual (mÂ²)":
+            if self.var_cs_mode.get() == "Manual (m²)":
                 rm_dict["manual_cross_sections"] = {
                     k: float(v.get()) for k, v in self._cs_manual_vars.items()
                 }
@@ -297,7 +297,7 @@ class ReactionsTab(ttk.Frame):
         self.var_density_dir.set(f"{dd[0]}, {dd[1]}, {dd[2]}")
         manual_cs = rm.get("manual_cross_sections") or {}
         if manual_cs:
-            self.var_cs_mode.set("Manual (mÂ²)")
+            self.var_cs_mode.set("Manual (m²)")
             for key, var in self._cs_manual_vars.items():
                 var.set(f"{manual_cs.get(key, 0.0):.3e}")
         else:
@@ -378,21 +378,21 @@ class ReactionsTab(ttk.Frame):
         sigma_ns = np.maximum(cs.cs_proj_ionization_h0(energy, isotope=iso), 1e-25)
         sigma_cx = np.maximum(cs.cs_cx_hp(energy, isotope=iso), 1e-25)
 
-        neg = "Hâ»" if iso == "H" else "Dâ»"
-        neu = "Hâ°" if iso == "H" else "Dâ°"
-        pos = "Hâº" if iso == "H" else "Dâº"
+        neg = "H⁻" if iso == "H" else "D⁻"
+        neu = "H⁰" if iso == "H" else "D⁰"
+        pos = "H⁺" if iso == "H" else "D⁺"
 
         self._rxn_cursor_artists.clear()
         self._rxn_fig.clear()
         ax = self._rxn_fig.add_subplot(111)
-        ax.loglog(energy, sigma_ss, label=f"{neg}â†’{neu} (single strip)", linewidth=1.8)
-        ax.loglog(energy, sigma_ds, label=f"{neg}â†’{pos} (double strip)", linewidth=1.8)
-        ax.loglog(energy, sigma_ns, label=f"{neu}â†’{pos} (neutral strip)", linewidth=1.8)
-        ax.loglog(energy, sigma_cx, label=f"{pos}â†’{neu} (charge exchange)", linewidth=1.8)
+        ax.loglog(energy, sigma_ss, label=f"{neg}→{neu} (single strip)", linewidth=1.8)
+        ax.loglog(energy, sigma_ds, label=f"{neg}→{pos} (double strip)", linewidth=1.8)
+        ax.loglog(energy, sigma_ns, label=f"{neu}→{pos} (neutral strip)", linewidth=1.8)
+        ax.loglog(energy, sigma_cx, label=f"{pos}→{neu} (charge exchange)", linewidth=1.8)
         ax.set_xlabel("Particle energy [eV]")
-        ax.set_ylabel("Cross section [mÂ²]")
+        ax.set_ylabel("Cross section [m²]")
         ax.set_ylim(bottom=1e-25)
-        ax.set_title(f"Beamâ€“Gas Cross Sections ({iso})")
+        ax.set_title(f"Beam–Gas Cross Sections ({iso})")
         ax.axvline(self.var_plot_energy.get(), color="gray", linestyle="--",
                     linewidth=1.0, alpha=0.7,
                     label=f"E = {self.var_plot_energy.get():.0f} eV")
@@ -445,12 +445,12 @@ class ReactionsTab(ttk.Frame):
         self._rxn_fig.clear()
         ax = self._rxn_fig.add_subplot(111)
         if is_uniform:
-            lbl = f"Uniform: {bg_density:.3e} mâ»Â³"
+            lbl = f"Uniform: {bg_density:.3e} m⁻³"
         else:
             lbl = os.path.basename(density_file) if density_file else "profile"
         ax.plot(distance, dens, color="tab:green", linewidth=2.0, label=lbl)
         ax.set_xlabel("Distance along beam direction [m]")
-        ax.set_ylabel("Gas density [mâ»Â³]")
+        ax.set_ylabel("Gas density [m⁻³]")
         ax.set_title("Background Gas Density Profile")
         ax.legend(fontsize=8)
         ax.grid(True, alpha=0.3)
@@ -505,7 +505,7 @@ class ReactionsTab(ttk.Frame):
         avg_mass_kg = HYDROGEN_MASS_KG if iso == "H" else DEUTERIUM_MASS_KG
         avg_speed = np.sqrt(2.0 * avg_energy_ev * ELEMENTARY_CHARGE_C / avg_mass_kg)
 
-        if self.var_cs_mode.get() == "Manual (mÂ²)":
+        if self.var_cs_mode.get() == "Manual (m²)":
             s_ss = float(self._cs_manual_vars["single_strip_neg_to_neutral"].get())
             s_ds = float(self._cs_manual_vars["double_strip_neg_to_positive"].get())
             s_ns = float(self._cs_manual_vars["strip_neutral_to_positive"].get())
@@ -542,9 +542,9 @@ class ReactionsTab(ttk.Frame):
         self._rxn_cursor_artists.clear()
         self._rxn_fig.clear()
         ax = self._rxn_fig.add_subplot(111)
-        ax.plot(distance, fractions[:, 0], label="Hâ»/Dâ»", linewidth=2.0)
-        ax.plot(distance, fractions[:, 1], label="Hâ°/Dâ°", linewidth=2.0)
-        ax.plot(distance, fractions[:, 2], label="Hâº/Dâº", linewidth=2.0)
+        ax.plot(distance, fractions[:, 0], label="H⁻/D⁻", linewidth=2.0)
+        ax.plot(distance, fractions[:, 1], label="H⁰/D⁰", linewidth=2.0)
+        ax.plot(distance, fractions[:, 2], label="H⁺/D⁺", linewidth=2.0)
         ax.set_xlabel("Distance along beam direction [m]")
         ax.set_ylabel("Species fraction")
         ax.set_title(f"Analytical Species Evolution (E={avg_energy_ev/1e3:.0f} keV)")
@@ -639,13 +639,13 @@ class ReactionsTab(ttk.Frame):
                     mfp_arrays.append(mfp)
 
             if not mfp_arrays:
-                self._var_mfp.set("Î» = âˆž (all Ïƒ = 0)")
+                self._var_mfp.set("λ = ∞ (all σ = 0)")
                 return
 
             all_mfp = np.concatenate(mfp_arrays)
             finite = all_mfp[np.isfinite(all_mfp) & (all_mfp > 0)]
             if finite.size == 0:
-                self._var_mfp.set("Î» = âˆž (zero density)")
+                self._var_mfp.set("λ = ∞ (zero density)")
                 return
 
             mfp_min = float(np.min(finite))
@@ -653,7 +653,7 @@ class ReactionsTab(ttk.Frame):
             em_step = self._get_em_step()
             ratio = em_step / mfp_min if mfp_min > 0 else float("inf")
             self._var_mfp.set(
-                f"Î»_min â‰ˆ {mfp_min:.3e} m  |  Î»_max â‰ˆ {mfp_max:.3e} m  |  step/Î»_min = {ratio:.3e}"
+                f"λ_min ≈ {mfp_min:.3e} m  |  λ_max ≈ {mfp_max:.3e} m  |  step/λ_min = {ratio:.3e}"
             )
         except Exception as exc:
             self._var_mfp.set(f"Error: {exc}")

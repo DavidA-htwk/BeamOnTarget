@@ -1,0 +1,10 @@
+# Force UTF-8 normalization for all text files
+* text=auto eol=lf
+
+# Explicitly treat source files as UTF-8
+*.py text working-tree-encoding=UTF-8
+*.md text working-tree-encoding=UTF-8
+*.rst text working-tree-encoding=UTF-8
+*.toml text working-tree-encoding=UTF-8
+*.yml text working-tree-encoding=UTF-8
+*.yaml text working-tree-encoding=UTF-8
