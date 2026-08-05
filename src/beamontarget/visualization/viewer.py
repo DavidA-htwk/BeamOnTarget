@@ -221,7 +221,8 @@ def _show_in_open3d(geometries, title="BeamOnTarget Viewer"):
     for geom in geometries:
         vis.add_geometry(geom)
     opt = vis.get_render_option()
-    opt.background_color = np.array([0.15, 0.15, 0.18])
+    opt.background_color = np.array([1, 1, 1])
+    print("backround color:", opt.background_color)
     opt.mesh_show_back_face = True
     opt.light_on = True
     vis.reset_view_point(True)
@@ -259,7 +260,7 @@ class _EmbeddedViewer:
     updated on each interaction, giving GPU-accelerated re-renders.
     """
 
-    _BG = np.array([0.15, 0.15, 0.18])
+    _BG = np.array([1.0, 1.0, 1.0]) #white background
     _RENDER_W = 720
     _RENDER_H = 520
 
