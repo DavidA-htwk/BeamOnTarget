@@ -82,6 +82,34 @@ class OutputTab(ttk.Frame):
         ttk.Entry(sm_grid, textvariable=self.var_sm_angle, width=12).grid(
             row=2, column=1, sticky="w", padx=(8, 0))
 
+        # --- Trajectory Export card (EM tracking mode only) ---
+        traj_card = make_card(self, "Trajectory Export (ParaView)")
+        self.var_traj_enabled = tk.BooleanVar(value=self.cfg.get("TRAJECTORY_EXPORT_ENABLED", False))
+        ttk.Checkbutton(traj_card, text="Save particle trajectories (.vtp) for ParaView",
+                         variable=self.var_traj_enabled,
+                         style="Card.TCheckbutton").pack(anchor="w", pady=(0, 8))
+        ttk.Label(traj_card,
+                  text="Only used with TRACKING_MODE = 'em_track_then_bvh'.",
+                  style="Dim.TLabel").pack(anchor="w", pady=(0, 8))
+
+        traj_grid = ttk.Frame(traj_card, style="Card.TFrame")
+        traj_grid.pack(fill="x")
+
+        ttk.Label(traj_grid, text="Max particles to record (total):", style="Card.TLabel").grid(
+            row=0, column=0, sticky="w", pady=5)
+        self.var_traj_max_particles = tk.IntVar(
+            value=self.cfg.get("TRAJECTORY_EXPORT_MAX_PARTICLES", 200))
+        ttk.Entry(traj_grid, textvariable=self.var_traj_max_particles, width=12).grid(
+            row=0, column=1, sticky="w", padx=(8, 0))
+        ttk.Label(traj_grid, text="(spread evenly across all beam origins)",
+                  style="Dim.TLabel").grid(row=0, column=2, sticky="w", padx=(6, 0))
+
+        ttk.Label(traj_grid, text="Output subfolder:", style="Card.TLabel").grid(
+            row=1, column=0, sticky="w", pady=5)
+        self.var_traj_dir = tk.StringVar(value=self.cfg.get("TRAJECTORY_EXPORT_DIR", "TRAJECTORIES"))
+        ttk.Entry(traj_grid, textvariable=self.var_traj_dir, width=20).grid(
+            row=1, column=1, sticky="w", padx=(8, 0))
+
     def collect(self, d):
         """Write output keys into *d*."""
         d["DETAILED_OUTPUT_DIR"] = self.var_outdir.get()
@@ -93,6 +121,9 @@ class OutputTab(ttk.Frame):
         d["SMOOTHING_NORMAL_THRESHOLD_DEG"] = self.var_sm_angle.get()
         mca = self.var_sm_mca.get().strip()
         d["SMOOTHING_MAX_CELL_AREA"] = float(mca) if mca else None
+        d["TRAJECTORY_EXPORT_ENABLED"] = self.var_traj_enabled.get()
+        d["TRAJECTORY_EXPORT_MAX_PARTICLES"] = self.var_traj_max_particles.get()
+        d["TRAJECTORY_EXPORT_DIR"] = self.var_traj_dir.get()
 
     def refresh(self, c):
         """Push config *c* values back into the widgets."""
@@ -106,3 +137,6 @@ class OutputTab(ttk.Frame):
         self.var_sm_angle.set(c.get("SMOOTHING_NORMAL_THRESHOLD_DEG", 7.0))
         mca = c.get("SMOOTHING_MAX_CELL_AREA")
         self.var_sm_mca.set(str(mca) if mca is not None else "")
+        self.var_traj_enabled.set(c.get("TRAJECTORY_EXPORT_ENABLED", False))
+        self.var_traj_max_particles.set(c.get("TRAJECTORY_EXPORT_MAX_PARTICLES", 200))
+        self.var_traj_dir.set(c.get("TRAJECTORY_EXPORT_DIR", "TRAJECTORIES"))

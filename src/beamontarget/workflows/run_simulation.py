@@ -153,6 +153,12 @@ def run_full_simulation(grouped_meshes, particle_source_file, output_subfolder):
             save_impact_flags=save_impact_flags_per_mesh,
             max_impact_records=max_impact_records_per_mesh,
             em_bvh_checkpoint_distance_m=config.EM_BVH_CHECKPOINT_DISTANCE_M,
+            trajectory_export_enabled=config.TRAJECTORY_EXPORT_ENABLED,
+            trajectory_export_max_particles=config.TRAJECTORY_EXPORT_MAX_PARTICLES,
+            trajectory_export_dir=(
+                os.path.join(output_dir_for_run, config.TRAJECTORY_EXPORT_DIR)
+                if config.TRAJECTORY_EXPORT_ENABLED else None
+            ),
         )
     else:
         raise ValueError(

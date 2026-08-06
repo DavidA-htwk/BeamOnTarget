@@ -93,6 +93,9 @@ def _build_dict():
         "SMOOTHING_RADIUS": SMOOTHING_RADIUS,
         "SMOOTHING_MAX_CELL_AREA": SMOOTHING_MAX_CELL_AREA,
         "PARAVIEW_PATH": PARAVIEW_PATH,
+        "TRAJECTORY_EXPORT_ENABLED": TRAJECTORY_EXPORT_ENABLED,
+        "TRAJECTORY_EXPORT_MAX_PARTICLES": TRAJECTORY_EXPORT_MAX_PARTICLES,
+        "TRAJECTORY_EXPORT_DIR": TRAJECTORY_EXPORT_DIR,
     }
 
 # ---------------------------------------------------------------------------
@@ -163,6 +166,11 @@ def _apply(d):
     g["SMOOTHING_MAX_CELL_AREA"]    = d.get("SMOOTHING_MAX_CELL_AREA", 4e-6)
 
     g["PARAVIEW_PATH"]              = d.get("PARAVIEW_PATH", "paraview")
+
+    g["TRAJECTORY_EXPORT_ENABLED"]  = d.get("TRAJECTORY_EXPORT_ENABLED", False)
+    g["TRAJECTORY_EXPORT_MAX_PARTICLES"] = d.get(
+        "TRAJECTORY_EXPORT_MAX_PARTICLES", d.get("TRAJECTORY_EXPORT_MAX_PARTICLES_PER_BATCH", 200))
+    g["TRAJECTORY_EXPORT_DIR"]      = d.get("TRAJECTORY_EXPORT_DIR", "TRAJECTORIES")
 
     g["PARTICLE_SOURCES"]           = []  # always empty; sources come from .bl files
 

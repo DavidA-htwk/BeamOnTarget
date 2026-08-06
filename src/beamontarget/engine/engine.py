@@ -15,6 +15,7 @@ from beamontarget.interactions.field_provider import create_field_provider
 from beamontarget.interactions.reactions import create_reaction_model
 from beamontarget.interactions.em_tracker_v2 import trace_particle_batch_em_only
 from beamontarget.engine.trajectory_intersector import intersect_trajectory_segments_bvh
+from beamontarget.io.trajectory_export import TrajectoryRecorder, OriginQuotaTracker
 
 def _empty_particle_batch():
     return {
@@ -303,6 +304,9 @@ def run_simulation_em_track_then_bvh(
     save_impact_flags=None,
     max_impact_records=None,
     em_bvh_checkpoint_distance_m=None,
+    trajectory_export_enabled=False,
+    trajectory_export_max_particles=200,
+    trajectory_export_dir=None,
 ):
     """
     Two-phase EM particle tracking:
@@ -355,6 +359,29 @@ def run_simulation_em_track_then_bvh(
 
     print(f"Processing ~{total_batches} particle batches (Phase 1 EM tracing + Phase 2 BVH)...")
 
+    # Per-origin (per source_index) trajectory-recording quota, shared
+    # (thread-safe) across all engine batches for the WHOLE run. This
+    # spreads the recording budget evenly across every beam origin instead
+    # of letting whichever origin is processed first consume it all.
+    # PARTICLE_BATCH_SIZE is an unrelated memory/parallelism tuning knob and
+    # can be much smaller than the number of origins/particles the user
+    # wants to visualize.
+    #
+    # A single TrajectoryRecorder is shared across ALL batches (rather than
+    # one per batch) because beam origins are scattered across many
+    # batches — one recorder per batch would write one .vtp file per batch.
+    trajectory_origin_tracker = None
+    trajectory_recorder = None
+    if trajectory_export_enabled:
+        all_source_indices = [int(s.source_index) for s in particle_sources_list]
+        trajectory_origin_tracker = OriginQuotaTracker(all_source_indices, trajectory_export_max_particles)
+        trajectory_recorder = TrajectoryRecorder()
+        print(
+            f"  - Trajectory export: {trajectory_origin_tracker.num_origins} origin(s), "
+            f"~{trajectory_origin_tracker.quota_per_origin} particle(s)/origin "
+            f"(target total ~{trajectory_export_max_particles})"
+        )
+
     def _process_particle_batch_em(batch, seed):
         perf_stats = {
             "em_pure_s": 0.0,
@@ -364,6 +391,14 @@ def run_simulation_em_track_then_bvh(
         }
         field_provider = create_field_provider(external_field_cfg)
         reaction_model = create_reaction_model(reaction_model_cfg)
+
+        # Reserve this batch's share of the per-origin trajectory quota
+        # (thread-safe). Only particles whose origin still has quota left
+        # get recorded into the shared trajectory_recorder.
+        trajectory_allowed_pids = None
+        if trajectory_origin_tracker is not None:
+            allowed = trajectory_origin_tracker.reserve(batch["source_indices"])
+            trajectory_allowed_pids = allowed if allowed else None
 
         # Accumulated sparse updates and impact records across all checkpoint passes
         all_sparse = [(None, None) for _ in face_counts]
@@ -397,6 +432,10 @@ def run_simulation_em_track_then_bvh(
 
         def _bvh_checkpoint_callback(segments_chunk):
             """Run BVH on a checkpoint segment chunk; accumulate results; return hit PIDs."""
+            if trajectory_recorder is not None and trajectory_allowed_pids is not None:
+                trajectory_recorder.add_segments(
+                    segments_chunk, trajectory_allowed_pids,
+                    particle_id_offset=seed * particle_batch_size)
             sparse_chunk, imp_chunk, hit_pids, species_chunk = intersect_trajectory_segments_bvh(
                 segments_chunk, intersector, face_offsets, face_counts, deposition_model,
                 save_impact_flags=save_impact_flags,
@@ -419,6 +458,11 @@ def run_simulation_em_track_then_bvh(
             bvh_hit_callback=_bvh_checkpoint_callback if bvh_checkpoint_steps is not None else None,
             perf_stats=perf_stats if perf_enabled else None,
         )
+
+        if trajectory_recorder is not None and trajectory_allowed_pids is not None:
+            trajectory_recorder.add_segments(
+                trajectory_segments, trajectory_allowed_pids,
+                particle_id_offset=seed * particle_batch_size)
 
         # Final BVH pass on the surviving segments (last checkpoint interval or all if no checkpoints)
         final_bvh_started_at = time.perf_counter()
@@ -522,6 +566,13 @@ def run_simulation_em_track_then_bvh(
                         batches_submitted += 1
                     except StopIteration:
                         pass
+
+    if trajectory_export_enabled and trajectory_recorder is not None and trajectory_export_dir:
+        traj_path = os.path.join(trajectory_export_dir, "trajectories.vtp")
+        if trajectory_recorder.save_vtp(traj_path):
+            print(f"Saved particle trajectories: {trajectory_recorder.n_particles_recorded} particle(s) -> {traj_path}")
+        else:
+            print("Trajectory export enabled but no particles were recorded.")
 
     total_deposited = sum(arr.sum() for arr in final_deposited_power)
     print(f"Total power deposited: {total_deposited:.2f} W")
