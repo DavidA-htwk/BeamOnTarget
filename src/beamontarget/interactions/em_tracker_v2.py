@@ -25,7 +25,59 @@ SEGMENT_DTYPE = [
 
 
 def boris_push(velocities_mps, q_over_m, dt_s, electric_field_vpm, magnetic_field_t):
-    """Non-relativistic Boris pusher for vectorized particle updates."""
+    """Boris pusher with an exact (Zenitani-Umeda-style) magnetic rotation.
+
+    The E-field half-kicks are the same as the classic leapfrog-Boris
+    scheme. The B-field rotation is applied via Rodrigues' rotation formula
+    using the *exact* cyclotron rotation angle theta = (q/m)*|B|*dt, instead
+    of the small-angle tan(theta/2) vector algebra used by the classic
+    Boris algorithm (t = B*q_over_m*dt/2; s = 2t/(1+|t|^2)).
+
+    The classic formula's applied rotation angle is 2*atan(|t|), which
+    saturates towards 180 deg per step no matter how large the true angle
+    (q/m)*|B|*dt actually is. Whenever a step spans an appreciable fraction
+    of a gyro-period (e.g. deep inside a strong-B region), that saturation
+    makes the pusher apply the WRONG rotation angle, producing spurious
+    "zig-zag" trajectories and incorrect deflection directions — even
+    though |v| (kinetic energy) still happens to be conserved exactly,
+    because the classic formula is a rotation too. The exact form below
+    removes the saturation (correct for any angle, including many full
+    turns per step) while remaining a pure rotation, so energy conservation
+    is unaffected — only the *direction* of the velocity is fixed.
+    """
+    half_dt = 0.5 * dt_s
+    qm_half_dt = q_over_m * half_dt
+
+    # Half electric-field kick
+    v_minus = velocities_mps + electric_field_vpm * qm_half_dt[:, np.newaxis]
+
+    # --- Exact magnetic rotation (Rodrigues' formula) ---
+    b_mag = np.sqrt(np.einsum('ij,ij->i', magnetic_field_t, magnetic_field_t))
+    b_mag_safe = np.where(b_mag > 0, b_mag, 1.0)
+    b_hat = magnetic_field_t / b_mag_safe[:, np.newaxis]
+
+    # Signed exact cyclotron rotation angle over the FULL dt. When |B| = 0,
+    # theta = 0 and b_hat is the zero vector, so v_rotated below correctly
+    # reduces to v_minus (no rotation) without any special-casing needed.
+    theta = q_over_m * b_mag * dt_s
+    cos_t = np.cos(theta)[:, np.newaxis]
+    sin_t = np.sin(theta)[:, np.newaxis]
+
+    v_parallel = np.einsum('ij,ij->i', v_minus, b_hat)[:, np.newaxis] * b_hat
+    v_perp = v_minus - v_parallel
+    v_rotated = v_parallel + v_perp * cos_t + sin_t * np.cross(v_perp, b_hat)
+
+    # Half electric-field kick
+    return v_rotated + electric_field_vpm * qm_half_dt[:, np.newaxis]
+
+
+def classic_boris_push(velocities_mps, q_over_m, dt_s, electric_field_vpm, magnetic_field_t):
+    """Classic (tan-half-angle) Boris pusher, matching the reference
+    CharlieHills92/BeamOnTarget implementation. Provided as a selectable
+    alternative to the exact Rodrigues rotation in boris_push(): it saturates
+    towards a 180 deg rotation per step for large (q/m)|B|dt, unlike the
+    exact form above.
+    """
     half_dt = 0.5 * dt_s
     qm_half_dt = q_over_m * half_dt
 
@@ -55,6 +107,8 @@ def trace_particle_batch_em_only(
     bvh_checkpoint_steps=None,
     bvh_hit_callback=None,
     perf_stats=None,
+    min_steps_per_gyro_orbit=None,
+    boris_method="exact",
 ):
     """
     Trace particles using EM integration ONLY (no mesh checks).
@@ -66,6 +120,14 @@ def trace_particle_batch_em_only(
     distance. Segments for particles already handled by the callback are NOT returned;
     only surviving segments (last checkpoint interval) are returned for the final BVH
     pass in the caller.
+
+    Optional adaptive spatial resolution (min_steps_per_gyro_orbit): if set,
+    the per-particle step size (dt) is additionally capped so that no single
+    step rotates the velocity by more than 360/min_steps_per_gyro_orbit
+    degrees around the LOCAL magnetic field. This shrinks dt (and hence the
+    spatial step length) only where the local field is strong enough that
+    EM_STEP_LENGTH_M would otherwise span an appreciable fraction of a
+    gyro-orbit, leaving weak-field regions at the full, fast step length.
 
     Returns:
         trajectory_segments: structured array with fields:
@@ -81,6 +143,16 @@ def trace_particle_batch_em_only(
     """
     trace_started_at = time.perf_counter()
     rng = np.random.default_rng(seed)
+    push_fn = classic_boris_push if boris_method == "classic" else boris_push
+
+    # Precompute the max rotation angle allowed per step (radians), used to
+    # adaptively shrink dt in strong local-B regions. None disables the cap
+    # entirely (pure spatial stepping, as before).
+    max_gyro_angle_per_step_rad = (
+        (2.0 * np.pi / min_steps_per_gyro_orbit)
+        if min_steps_per_gyro_orbit is not None and min_steps_per_gyro_orbit > 0
+        else None
+    )
 
     if particle_batch["origins"].size == 0:
         return np.array([], dtype=SEGMENT_DTYPE)
@@ -183,9 +255,23 @@ def trace_particle_batch_em_only(
 
         e_field, b_field = field_provider.sample(p, particle_time[active_idx])
         q_over_m = (q_state * ELEMENTARY_CHARGE_C) / np.maximum(m, 1e-30)
-        v_next = boris_push(v, q_over_m, dt, e_field, b_field)
 
-        # Boris conserves speed — seg_len = em_step_length_m; no second norm needed
+        if max_gyro_angle_per_step_rad is not None:
+            # Adaptively shrink dt where the local B is strong enough that
+            # the spatial step would otherwise span more than the allowed
+            # rotation angle per step (i.e. cover an appreciable fraction of
+            # a gyro-orbit). Weak-field regions are unaffected (dt_cyclotron
+            # is large there, so the min() just keeps the spatial dt).
+            b_mag = np.sqrt(np.einsum('ij,ij->i', b_field, b_field))
+            omega_c = np.abs(q_over_m) * b_mag
+            dt_cyclotron = np.where(omega_c > 0, max_gyro_angle_per_step_rad / np.maximum(omega_c, 1e-300), np.inf)
+            dt = np.minimum(dt, dt_cyclotron)
+
+        v_next = push_fn(v, q_over_m, dt, e_field, b_field)
+
+        # Boris conserves speed, but the actual step length is now
+        # speed*dt, which is <= em_step_length_m whenever the cyclotron cap
+        # above shrank dt (i.e. in strong local B) — no second norm needed.
         p_next = p + v_next * dt[:, np.newaxis]
         if not np.all(valid):
             p_next[~valid] = p[~valid]  # zero-speed particles stay in place

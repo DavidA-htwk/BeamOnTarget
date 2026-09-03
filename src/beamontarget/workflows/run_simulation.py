@@ -117,6 +117,12 @@ def run_full_simulation(grouped_meshes, particle_source_file, output_subfolder):
             num_cpu_cores=config.NUM_CPU_CORES,
             save_impact_flags=save_impact_flags_per_mesh,
             max_impact_records=max_impact_records_per_mesh,
+            trajectory_export_enabled=config.TRAJECTORY_EXPORT_ENABLED,
+            trajectory_export_max_particles=config.TRAJECTORY_EXPORT_MAX_PARTICLES,
+            trajectory_export_dir=(
+                os.path.join(output_dir_for_run, config.TRAJECTORY_EXPORT_DIR)
+                if config.TRAJECTORY_EXPORT_ENABLED else None
+            ),
         )
         per_species_power = {}  # not available in ray mode
     elif tracking_mode == "em_track_then_bvh":
@@ -159,6 +165,8 @@ def run_full_simulation(grouped_meshes, particle_source_file, output_subfolder):
                 os.path.join(output_dir_for_run, config.TRAJECTORY_EXPORT_DIR)
                 if config.TRAJECTORY_EXPORT_ENABLED else None
             ),
+            em_min_steps_per_gyro_orbit=config.EM_MIN_STEPS_PER_GYRO_ORBIT,
+            em_boris_method=config.EM_BORIS_METHOD,
         )
     else:
         raise ValueError(

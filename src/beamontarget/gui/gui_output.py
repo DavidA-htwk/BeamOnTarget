@@ -82,14 +82,14 @@ class OutputTab(ttk.Frame):
         ttk.Entry(sm_grid, textvariable=self.var_sm_angle, width=12).grid(
             row=2, column=1, sticky="w", padx=(8, 0))
 
-        # --- Trajectory Export card (EM tracking mode only) ---
+        # --- Trajectory Export card (both tracking modes) ---
         traj_card = make_card(self, "Trajectory Export (ParaView)")
         self.var_traj_enabled = tk.BooleanVar(value=self.cfg.get("TRAJECTORY_EXPORT_ENABLED", False))
         ttk.Checkbutton(traj_card, text="Save particle trajectories (.vtp) for ParaView",
                          variable=self.var_traj_enabled,
                          style="Card.TCheckbutton").pack(anchor="w", pady=(0, 8))
         ttk.Label(traj_card,
-                  text="Only used with TRACKING_MODE = 'em_track_then_bvh'.",
+                  text="Works with either TRACKING_MODE ('ray' or 'em_track_then_bvh').",
                   style="Dim.TLabel").pack(anchor="w", pady=(0, 8))
 
         traj_grid = ttk.Frame(traj_card, style="Card.TFrame")
